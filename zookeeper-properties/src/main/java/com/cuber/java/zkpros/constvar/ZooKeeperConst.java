@@ -5,5 +5,9 @@ package com.cuber.java.zkpros.constvar;
  */
 public class ZooKeeperConst {
 
-    public static String ZKROOT;
+    public static final String ZKROOT = "/config_center";
+
+    public static final String ZKSPKEY = "/config_center/spkey";
+
+    public static final String PUBLICCONFIG="/config_center/public_config";
 }

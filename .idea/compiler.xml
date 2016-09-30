@@ -22,10 +22,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="zkpros-web-manager" />
         <module name="zookeeper-properties" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
+      <module name="zkpros-web-manager" target="1.6" />
       <module name="zookeeper-manager" target="1.6" />
       <module name="zookeeper-properties" target="1.6" />
     </bytecodeTargetLevel>
