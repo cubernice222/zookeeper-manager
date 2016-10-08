@@ -8,6 +8,11 @@ public class ZooKeeperNode extends ZooKeeperProsNode {
     private boolean mask;
     private String maskKey;
 
+    public ZooKeeperNode(){
+        super();
+        setType("4");
+    }
+
     public String getValue() {
         return value;
     }

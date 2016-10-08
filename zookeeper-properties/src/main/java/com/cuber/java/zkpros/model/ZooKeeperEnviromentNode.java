@@ -6,6 +6,10 @@ package com.cuber.java.zkpros.model;
 public class ZooKeeperEnviromentNode extends ZooKeeperProsNode {
     private String accKey;
     private String accRule;
+    public ZooKeeperEnviromentNode(){
+        super();
+        setType("1");
+    }
 
     public String getAccKey() {
         return accKey;

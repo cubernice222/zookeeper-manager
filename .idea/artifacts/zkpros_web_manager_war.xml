@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="zkpros-web-manager:war">
+    <output-path>$PROJECT_DIR$/zkpros-web-manager/target</output-path>
+    <root id="archive" name="zkpros-web-manager.war">
+      <element id="artifact" artifact-name="zkpros-web-manager:war exploded" />
+    </root>
+  </artifact>
+</component>
