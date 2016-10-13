@@ -1,0 +1,286 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/index.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div class="navbar navbar-duomi navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#" id="logo">Zookeeper 配置中心</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <ul id="main-nav" class="nav nav-tabs nav-stacked" style="">
+                <li class="active" sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a href="#"> <i class="glyphicon glyphicon-th-large"></i>
+                        首页
+                    </a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse"> <i
+                            class="glyphicon glyphicon-cog"></i>
+                        系统管理
+                        <span class="pull-right glyphicon glyphicon-chevron-down"></span>
+                    </a>
+                    <ul id="systemSetting" class="nav nav-list secondmenu collapse" style="height: 0px;">
+                        <li>
+                            <a href="#panel-1" data-toggle="tab">
+                                <i class="glyphicon glyphicon-user"></i>
+                                类别
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#panel-2" data-toggle="tab">
+                                <i class="glyphicon glyphicon-th-list"></i>
+                                类别1
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-asterisk"></i>
+                                类别2
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-edit"></i>
+                                类别3
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="glyphicon glyphicon-eye-open"></i>
+                                类别4
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="glyphicon glyphicon-credit-card"></i>
+                        类别5
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="glyphicon glyphicon-globe"></i>
+                        类别6
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <div class="col-md-12">
+                <div class="row">
+                    <form class="form-search form-inline">
+                        <label class="" for="search">查询：</label>
+                        <input class="input-medium search-query form-control" id="search" type="text"/>
+                        <button type="submit" class="btn btn-primary">查找</button>
+                    </form>
+                </div>
+
+            </div>
+            <br/>
+            <br/>
+            <br/>
+            <div class="tab-content">
+                <div class="tab-pane active" id="panel-1">
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group">
+                            <label class="" for="add">增加：</label>
+                            <input type="text" class="form-control" id="add"/>
+                            <button class="btn btn-primary">增加</button>
+
+                        </div>
+                    </form>
+                    <form class="form-inline dis-inline col-md-offset-2" role="form">
+                        <div class="form-group">
+                            <label class="" for="del">删除：</label>
+                            <input type="text" class="form-control" id="del"/>
+                            <button class="btn btn-primary">删除</button>
+                        </div>
+
+                    </form>
+                    <br/>
+                    <br/>
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group">
+                            <label class="" for="update">修改：</label>
+                            <input type="text" id="update" class="form-control"/>
+                            <button class="btn btn-primary">修改</button>
+
+                        </div>
+                    </form>
+                    <form class="form-inline dis-inline col-md-offset-2" role="form">
+                        <div class="form-group dis-inline">
+                            <label class="" for="select">查询：</label>
+                            <input type="text" class="form-control" id="select"/>
+                            <button class="btn btn-primary">查询</button>
+                        </div>
+
+                    </form>
+
+                    <br/>
+                    <br/>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>产品</th>
+                            <th>交付时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>TB - Monthly</td>
+                            <td>01/04/2012</td>
+                            <td>Default</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">删除</button>
+                                <button class="btn btn-primary btn-sm update">修改</button>
+                            </td>
+                        </tr>
+                        <tr class="success">
+                            <td>1</td>
+                            <td>TB - Monthly</td>
+                            <td>01/04/2012</td>
+                            <td>Approved</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">删除</button>
+                                <button class="btn btn-primary btn-sm update">修改</button>
+                            </td>
+                        </tr>
+                        <tr class="error">
+                            <td>2</td>
+                            <td>TB - Monthly</td>
+                            <td>02/04/2012</td>
+                            <td>Declined</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">删除</button>
+                                <button class="btn btn-primary btn-sm update">修改</button>
+                            </td>
+                        </tr>
+                        <tr class="warning">
+                            <td>3</td>
+                            <td>TB - Monthly</td>
+                            <td>03/04/2012</td>
+                            <td>Pending</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">删除</button>
+                                <button class="btn btn-primary btn-sm update">修改</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <nav class="text-center">
+                        <ul class="pagination">
+                            <li>
+                                <a href="#">&laquo;</a>
+                            </li>
+                            <li>
+                                <a href="#">1</a>
+                            </li>
+                            <li>
+                                <a href="#">2</a>
+                            </li>
+                            <li>
+                                <a href="#">3</a>
+                            </li>
+                            <li>
+                                <a href="#">4</a>
+                            </li>
+                            <li>
+                                <a href="#">5</a>
+                            </li>
+                            <li>
+                                <a href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center">
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">弹出窗</button>
+        </p>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">弹窗标题</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group">
+                            <label class="" for="add">增加：</label>
+                            <input type="text" class="form-control" id="add"/>
+                            <button class="btn btn-primary">增加</button>
+
+                        </div>
+                    </form>
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group">
+                            <label class="" for="del">删除：</label>
+                            <input type="text" class="form-control" id="del"/>
+                            <button class="btn btn-primary">删除</button>
+                        </div>
+
+                    </form>
+                    <br/>
+                    <br/>
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group">
+                            <label class="" for="update">修改：</label>
+                            <input type="text" id="update" class="form-control"/>
+                            <button class="btn btn-primary">修改</button>
+
+                        </div>
+                    </form>
+                    <form class="form-inline dis-inline" role="form">
+                        <div class="form-group dis-inline">
+                            <label class="" for="select">查询：</label>
+                            <input type="text" class="form-control" id="select"/>
+                            <button class="btn btn-primary">查询</button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+                <button type="button" class="btn btn-primary">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>
