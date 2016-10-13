@@ -7,6 +7,11 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.CreateMode;
 
 import com.cuber.zkweb.model.Page;
+import org.springframework.beans.BeanWrapperImpl;
+
+import javax.servlet.http.HttpServletRequest;
+import java.beans.PropertyDescriptor;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,6 +44,9 @@ public class ZkUtils {
     }
 
     public static ZooKeeperProsNode getNode(String pathNode, ZkClient zkClient){
+        if(!zkClient.exists(pathNode)){
+            return null;
+        }
         String nodeJson =  zkClient.readData(pathNode);
         Gson gson = new Gson();
         ZooKeeperProsNode returnObj = gson.fromJson(nodeJson,ZooKeeperProsNode.class);
@@ -56,6 +64,40 @@ public class ZkUtils {
                 returnObj = gson.fromJson(nodeJson,ZooKeeperNode.class);
         }
         return returnObj;
+    }
+
+    public static <T> T convert(Class<T> targetClass, HttpServletRequest request) {
+        HashMap paraMap = new HashMap(request.getParameterMap());
+
+        try {
+            T e = targetClass.newInstance();
+            BeanWrapperImpl bean = new BeanWrapperImpl(e);
+            PropertyDescriptor[] propertyDescriptors = bean.getPropertyDescriptors();
+            PropertyDescriptor[] arr$ = propertyDescriptors;
+            int len$ = propertyDescriptors.length;
+
+            for(int i$ = 0; i$ < len$; ++i$) {
+                PropertyDescriptor property = arr$[i$];
+                String propertyName = property.getDisplayName();
+                Object value = paraMap.get(propertyName);
+                if(value instanceof String[]) {
+                    String[] tem = (String[])((String[])value);
+                    value = tem[0];
+                }
+
+                if(!"class".equals(propertyName)) {
+                    bean.setPropertyValue(propertyName, value == null?null:value.toString().trim());
+                }
+            }
+
+            return e;
+        } catch (InstantiationException var13) {
+            var13.printStackTrace();
+        } catch (IllegalAccessException var14) {
+            var14.printStackTrace();
+        }
+
+        return null;
     }
 
 
