@@ -1,4 +1,4 @@
-package com.ipaylinks.project.config;
+package com.cuber.zkweb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
