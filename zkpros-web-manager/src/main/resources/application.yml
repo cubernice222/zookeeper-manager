@@ -5,10 +5,9 @@ zookeeper:
   server:
     list: 172.168.1.72:2181
   manage:
-    mainpath: /zkconfig
+    mainpath: /config_center
     env: dev,sit,pre,prod
-    encryptkeyPath: /zkconfig/encryptkey
-    encryptNodeRegex: /zkconfig/encryptNodeRegex
+    encryptkeyPath: /config_center/spkey
     dev: 123456
     sit: 123456
     pre: 123456
