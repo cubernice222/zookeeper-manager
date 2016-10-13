@@ -47,9 +47,9 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ipaylinks.autoset</groupId>
-            <artifactId>zkproperties</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.cuber.java</groupId>
+            <artifactId>zookeeper-manager</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
@@ -81,6 +81,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.cuber.java</groupId>
+            <artifactId>zookeeper-properties</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
