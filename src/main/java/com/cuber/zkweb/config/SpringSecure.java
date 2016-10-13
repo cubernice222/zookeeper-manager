@@ -38,6 +38,8 @@ public class SpringSecure extends WebSecurityConfigurerAdapter {
                 .permitAll().and().logout().permitAll();
     }
 
+
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()

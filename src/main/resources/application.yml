@@ -1,6 +1,5 @@
 server:
   port: 8080
-
 zookeeper:
   server:
     list: 172.168.1.72:2181
