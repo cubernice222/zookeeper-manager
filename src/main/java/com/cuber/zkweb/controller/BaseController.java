@@ -14,6 +14,7 @@ import java.util.Map;
 public class BaseController {
     @RequestMapping("/index.htm")
     public ModelAndView index(Map<String, Object> mode){
+
         return new ModelAndView("index").addObject(mode);
     }
 

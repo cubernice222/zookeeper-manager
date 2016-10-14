@@ -132,4 +132,8 @@ public class NodeController {
         return responseMessage;
     }
 
+    public ResponseMessage getPromitionEnv(){
+        return null;
+    }
+
 }
