@@ -48,22 +48,28 @@ public class ZkUtils {
             return null;
         }
         String nodeJson =  zkClient.readData(pathNode);
-        Gson gson = new Gson();
-        ZooKeeperProsNode returnObj = gson.fromJson(nodeJson,ZooKeeperProsNode.class);
-        switch (returnObj.getType()) {
-            case "1":
-                returnObj = gson.fromJson(nodeJson,ZooKeeperEnviromentNode.class);
-                break;
-            case "2":
-                returnObj = gson.fromJson(nodeJson,ZooKeeperProjectNode.class);
-                break;
-            case "3":
-                returnObj = gson.fromJson(nodeJson,ZooKeeperFolderNode.class);
-                break;
-            default:
-                returnObj = gson.fromJson(nodeJson,ZooKeeperNode.class);
+        try{
+            Gson gson = new Gson();
+            ZooKeeperProsNode returnObj = gson.fromJson(nodeJson,ZooKeeperProsNode.class);
+            switch (returnObj.getType()) {
+                case "1":
+                    returnObj = gson.fromJson(nodeJson,ZooKeeperEnviromentNode.class);
+                    break;
+                case "2":
+                    returnObj = gson.fromJson(nodeJson,ZooKeeperProjectNode.class);
+                    break;
+                case "3":
+                    returnObj = gson.fromJson(nodeJson,ZooKeeperFolderNode.class);
+                    break;
+                default:
+                    returnObj = gson.fromJson(nodeJson,ZooKeeperNode.class);
+            }
+            return returnObj;
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        return returnObj;
+
+        return null;
     }
 
     public static <T> T convert(Class<T> targetClass, HttpServletRequest request) {

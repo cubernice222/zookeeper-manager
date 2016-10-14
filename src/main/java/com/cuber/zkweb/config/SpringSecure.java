@@ -18,16 +18,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @AutoConfigureBefore(SecurityAutoConfiguration.class)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SpringSecure extends WebSecurityConfigurerAdapter {
-    @Value("${zookeeper.manage.sit}")
+    @Value("${zookeeper.manage.sitpwd}")
     private String sitPassword;
 
-    @Value("${zookeeper.manage.dev}")
+    @Value("${zookeeper.manage.devpwd}")
     private String devPassword;
 
-    @Value("${zookeeper.manage.pre}")
+    @Value("${zookeeper.manage.prepwd}")
     private String prePassword;
 
-    @Value("${zookeeper.manage.prod}")
+    @Value("${zookeeper.manage.prodpwd}")
     private String prodPassword;
 
     @Override
@@ -43,13 +43,13 @@ public class SpringSecure extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("dev").password(devPassword).roles("dev");
+                .withUser("dev").password(devPassword).roles("Zkdev");
         auth.inMemoryAuthentication()
-                .withUser("sit").password(sitPassword).roles("sit","dev");
+                .withUser("sit").password(sitPassword).roles("Zksit","Zkdev");
         auth.inMemoryAuthentication()
-                .withUser("pre").password(prePassword).roles("pre","dev");
+                .withUser("pre").password(prePassword).roles("Zkpre","Zkdev");
         auth.inMemoryAuthentication()
-                .withUser("prod").password(prodPassword).roles("prod","dev");
+                .withUser("prod").password(prodPassword).roles("Zkprod","Zkdev");
     }
 
 }

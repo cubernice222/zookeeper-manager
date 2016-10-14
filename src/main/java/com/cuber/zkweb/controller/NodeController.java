@@ -10,13 +10,16 @@ import com.google.gson.Gson;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by cuber on 2016/10/13.
@@ -28,6 +31,7 @@ public class NodeController {
 
     @Value("${zookeeper.manage.spkeyInitPwd}")
     private String spKey;
+
 
     @RequestMapping("/postNode.json")
     public ResponseMessage postNode(HttpServletRequest request,ZooKeeperProsNode node){
@@ -132,8 +136,36 @@ public class NodeController {
         return responseMessage;
     }
 
-    public ResponseMessage getPromitionEnv(){
-        return null;
+    @RequestMapping("/getPermissionEnv.json")
+    public ResponseMessage getPermissionEnv(){
+
+        ResponseMessage responseMessage = new ResponseMessage();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        Page page = ZkUtils.getPage(ZooKeeperConst.ZKROOT,null,zkClient);
+        if(page != null){
+            List<ZooKeeperProsNode> allNode = page.getZooKeeperProsNodes();
+            List<ZooKeeperProsNode> left = null;
+            if(allNode != null && null != authorities && authorities.size() > 0){
+                StringBuilder sb =  new StringBuilder();
+                authorities.stream().forEach(authority -> sb.append(authority.getAuthority()).append(";"));
+                String containStr = sb.toString();
+                left = allNode.stream().
+                        filter(node -> {
+                            if(node instanceof ZooKeeperEnviromentNode){
+                                return containStr.indexOf(((ZooKeeperEnviromentNode) node).getAccRule()) > -1;
+                            }
+                            return false;
+                        }).collect(Collectors.toList());
+                if(left != null && left.size() > 0){
+                    Gson gson = new Gson();
+                    responseMessage.isDone();
+                    responseMessage.setTransJsonValue(gson.toJson(left));
+                }
+            }
+        }
+        responseMessage.setMessage("不能找到可授权的环境节点");
+        return responseMessage;
     }
 
 }

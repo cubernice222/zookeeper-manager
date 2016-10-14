@@ -44,7 +44,7 @@ public class ZooKeeperConfig {
 
         ZooKeeperEnviromentNode devNode = new ZooKeeperEnviromentNode();//
         devNode.setParentPath(ZooKeeperConst.ZKROOT);
-        devNode.setAccRule("Role_Zkdev");
+        devNode.setAccRule("ROLE_Zkdev");
         devNode.setAccKey(accKey);
         devNode.setDesc("开发环境");
         devNode.setName("dev");
@@ -53,7 +53,7 @@ public class ZooKeeperConfig {
 
         ZooKeeperEnviromentNode sitNode = new ZooKeeperEnviromentNode();
         BeanUtils.copyProperties(devNode, sitNode);
-        sitNode.setAccRule("Role_Zksit");
+        sitNode.setAccRule("ROLE_Zksit");
         sitNode.setDesc("测试环境");
         sitNode.setName("sit");
 
@@ -62,7 +62,7 @@ public class ZooKeeperConfig {
 
         ZooKeeperEnviromentNode preNode = new ZooKeeperEnviromentNode();
         BeanUtils.copyProperties(devNode, preNode);
-        preNode.setAccRule("Role_Zkpre");
+        preNode.setAccRule("ROLE_Zkpre");
         preNode.setDesc("预上线环境");
         preNode.setName("pre");
 
@@ -71,7 +71,7 @@ public class ZooKeeperConfig {
 
         ZooKeeperEnviromentNode prodNode = new ZooKeeperEnviromentNode();
         BeanUtils.copyProperties(devNode, prodNode);
-        prodNode.setAccRule("Role_Zkprod");
+        prodNode.setAccRule("ROLE_Zkprod");
         prodNode.setDesc("生产环境");
         prodNode.setName("prod");
 

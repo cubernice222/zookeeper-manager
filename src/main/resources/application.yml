@@ -6,6 +6,10 @@ zookeeper:
   manage:
     spkeyInitPwd: 123456
     envAccKey: 123456
+    sitpwd: 123456
+    devpwd: 123456
+    prepwd: 123456
+    prodpwd: 123456
 spring:
   application:
     name: zookeeperManager
