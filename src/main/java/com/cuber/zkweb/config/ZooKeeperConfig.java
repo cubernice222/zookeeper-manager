@@ -3,6 +3,7 @@ package com.cuber.zkweb.config;
 
 import com.cuber.java.zkpros.constvar.ZooKeeperConst;
 import com.cuber.java.zkpros.model.ZooKeeperEnviromentNode;
+import com.cuber.java.zkpros.model.ZooKeeperProjectNode;
 import com.cuber.zkweb.util.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.CreateMode;
@@ -33,9 +34,15 @@ public class ZooKeeperConfig {
         if(!zkClient.exists(ZooKeeperConst.ZKROOT)){//创建配置中心root根路径
             zkClient.create(ZooKeeperConst.ZKROOT,"zookeeper config center", CreateMode.PERSISTENT);
         }
+        ZooKeeperProjectNode node = new ZooKeeperProjectNode();
+        node.setName("public_config");
+        node.setDesc("zookeeper 通配中心");
+        node.setParentPath(ZooKeeperConst.ZKROOT);
 
         if(!zkClient.exists(ZooKeeperConst.PUBLICCONFIG)){
-            zkClient.create(ZooKeeperConst.PUBLICCONFIG,"zookeeper 通配中心", CreateMode.PERSISTENT);
+            ZkUtils.createNode(node, zkClient);
+        }else{
+            ZkUtils.update(node, zkClient);
         }
 
         if(!zkClient.exists(ZooKeeperConst.ZKSPKEY)){//创建3D加密KEY

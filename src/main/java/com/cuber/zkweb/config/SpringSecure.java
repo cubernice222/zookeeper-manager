@@ -30,6 +30,9 @@ public class SpringSecure extends WebSecurityConfigurerAdapter {
     @Value("${zookeeper.manage.prodpwd}")
     private String prodPassword;
 
+    @Value("${zookeeper.manage.adminPwd}")
+    private String adminPwd;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/css/**").permitAll().anyRequest()
@@ -42,6 +45,8 @@ public class SpringSecure extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("admin").password(adminPwd).roles("admin");
         auth.inMemoryAuthentication()
                 .withUser("dev").password(devPassword).roles("Zkdev");
         auth.inMemoryAuthentication()

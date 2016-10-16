@@ -35,8 +35,8 @@ public class NodeController {
 
     @RequestMapping("/postNode.json")
     public ResponseMessage postNode(HttpServletRequest request,ZooKeeperProsNode node){
+        ZkUtils.haveRightAccessNode(zkClient,node);
         ResponseMessage responseMessage = new ResponseMessage();
-
         node = getRightZknode(request,node);
 
         try{
@@ -55,6 +55,7 @@ public class NodeController {
     }
 
     private ZooKeeperProsNode getRightZknode(HttpServletRequest request,ZooKeeperProsNode node){
+        ZkUtils.haveRightAccessNode(zkClient,node);
         ZooKeeperProsNode returnObj = node;
         switch (node.getType()) {
             case "1":
@@ -74,6 +75,7 @@ public class NodeController {
 
     @RequestMapping("/deleteNode.json")
     public ResponseMessage deleteNode(ZooKeeperProsNode node){
+        ZkUtils.haveRightAccessNode(zkClient,node);
         ResponseMessage responseMessage = new ResponseMessage();
         try{
             if(zkClient.exists(node.getParentPath() + "/" + node.getName())){
@@ -90,6 +92,7 @@ public class NodeController {
 
     @RequestMapping("/getEncrypt.json")
     public ResponseMessage getEncrypt(String value){
+
         ResponseMessage responseMessage = new ResponseMessage();
         Map<String,String> map = new HashMap<>();
         String maskKey = spKey;
@@ -113,6 +116,8 @@ public class NodeController {
 
     @RequestMapping("/getPage.json")
     public Page getChildrenNode(@RequestParam(value="path")String path, Page page){
+        ZooKeeperProsNode node = ZkUtils.getNode(path,zkClient);
+        ZkUtils.haveRightAccessNode(zkClient,node);
         try{
             Page returnPage = ZkUtils.getPage(path,page,zkClient);
             return returnPage;
@@ -125,6 +130,7 @@ public class NodeController {
     @RequestMapping("/postCopy.json")
     public ResponseMessage copyPath(@RequestParam(value="overWriten")boolean overWriten,
                                     ZooKeeperProsNode node, @RequestParam(value="path")String path){
+        ZkUtils.haveRightAccessNode(zkClient,node);
         ResponseMessage responseMessage = new ResponseMessage();
         try{
             ZkUtils.copyNode(node,zkClient,path,overWriten);
@@ -138,33 +144,15 @@ public class NodeController {
 
     @RequestMapping("/getPermissionEnv.json")
     public ResponseMessage getPermissionEnv(){
-
         ResponseMessage responseMessage = new ResponseMessage();
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        Page page = ZkUtils.getPage(ZooKeeperConst.ZKROOT,null,zkClient);
-        if(page != null){
-            List<ZooKeeperProsNode> allNode = page.getZooKeeperProsNodes();
-            List<ZooKeeperProsNode> left = null;
-            if(allNode != null && null != authorities && authorities.size() > 0){
-                StringBuilder sb =  new StringBuilder();
-                authorities.stream().forEach(authority -> sb.append(authority.getAuthority()).append(";"));
-                String containStr = sb.toString();
-                left = allNode.stream().
-                        filter(node -> {
-                            if(node instanceof ZooKeeperEnviromentNode){
-                                return containStr.indexOf(((ZooKeeperEnviromentNode) node).getAccRule()) > -1;
-                            }
-                            return false;
-                        }).collect(Collectors.toList());
-                if(left != null && left.size() > 0){
-                    Gson gson = new Gson();
-                    responseMessage.isDone();
-                    responseMessage.setTransJsonValue(gson.toJson(left));
-                }
-            }
+        List<ZooKeeperEnviromentNode> currentUserNode = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
+        if(currentUserNode != null && currentUserNode.size() > 0){
+            Gson gson = new Gson();
+            responseMessage.setDone(true);
+            responseMessage.setTransJsonValue(gson.toJson(currentUserNode));
+        }else{
+            responseMessage.setMessage("不能找到可授权的环境节点");
         }
-        responseMessage.setMessage("不能找到可授权的环境节点");
         return responseMessage;
     }
 

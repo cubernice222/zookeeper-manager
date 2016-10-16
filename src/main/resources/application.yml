@@ -2,7 +2,7 @@ server:
   port: 8080
 zookeeper:
   server:
-    list: 172.168.1.72:2181
+    list: 127.0.0.1:2181
   manage:
     spkeyInitPwd: 123456
     envAccKey: 123456
@@ -10,6 +10,7 @@ zookeeper:
     devpwd: 123456
     prepwd: 123456
     prodpwd: 123456
+    adminPwd: cuber
 spring:
   application:
     name: zookeeperManager
