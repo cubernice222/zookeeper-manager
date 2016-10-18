@@ -28,8 +28,9 @@
                     </a>
                 </li>
 
-                <li th:each="oneEnvNode,itemStat:${pageVar}">
-                    <a href="#" th:text="${oneEnvNode.desc}"> <i class="glyphicon glyphicon-th-large"></i>
+                <li th:each="oneEnvNode,itemStat:${accessEnvs}">
+                    <a href="#"> <i class="glyphicon glyphicon-th-large"></i>
+                        <span th:text="${oneEnvNode.desc}"></span>
                         <input name="parentPath" th:value="${oneEnvNode.parentPath}" type="hidden"/>
                         <input name="name" th:value="${oneEnvNode.name}" type="hidden"/>
                     </a>
@@ -38,19 +39,6 @@
             </ul>
         </div>
         <div class="col-md-10">
-            <div class="col-md-12">
-                <div class="row">
-                    <form class="form-search form-inline">
-                        <label class="" for="search">查询：</label>
-                        <input class="input-medium search-query form-control" id="search" type="text"/>
-                        <button type="submit" class="btn btn-primary">查找</button>
-                    </form>
-                </div>
-
-            </div>
-            <br/>
-            <br/>
-            <br/>
             <div class="tab-content">
                 <div class="tab-pane active" id="panel-1">
                     <form class="form-inline dis-inline" role="form">
@@ -58,7 +46,6 @@
                             <label class="" for="add">增加：</label>
                             <input type="text" class="form-control" id="add"/>
                             <button class="btn btn-primary">增加</button>
-
                         </div>
                     </form>
                     <form class="form-inline dis-inline col-md-offset-2" role="form">
@@ -91,64 +78,34 @@
                     <br/>
                     <br/>
                     <table class="table">
-                        <thead>
                         <tr>
-                            <th>编号</th>
-                            <th>产品</th>
-                            <th>交付时间</th>
-                            <th>状态</th>
+                            <th>节点名称</th>
+                            <th>节点描述</th>
+                            <th>是否加密</th>
+                            <th>节点值</th>
                             <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>TB - Monthly</td>
-                            <td>01/04/2012</td>
-                            <td>Default</td>
+                        <tr th:each="oneEnvNode,itemStat:${page.zooKeeperProsNodes}">
+                            <td th:text="${oneEnvNode.name}"/>
+                            <td th:text="${oneEnvNode.desc}"/>
+                            <td th:text="${oneEnvNode.mask}?'是':'否''"/>
                             <td>
-                                <button class="btn btn-primary btn-sm">删除</button>
-                                <button class="btn btn-primary btn-sm update">修改</button>
-                            </td>
-                        </tr>
-                        <tr class="success">
-                            <td>1</td>
-                            <td>TB - Monthly</td>
-                            <td>01/04/2012</td>
-                            <td>Approved</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm">删除</button>
-                                <button class="btn btn-primary btn-sm update">修改</button>
-                            </td>
-                        </tr>
-                        <tr class="error">
-                            <td>2</td>
-                            <td>TB - Monthly</td>
-                            <td>02/04/2012</td>
-                            <td>Declined</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm">删除</button>
-                                <button class="btn btn-primary btn-sm update">修改</button>
-                            </td>
-                        </tr>
-                        <tr class="warning">
-                            <td>3</td>
-                            <td>TB - Monthly</td>
-                            <td>03/04/2012</td>
-                            <td>Pending</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm">删除</button>
-                                <button class="btn btn-primary btn-sm update">修改</button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-danger">删除</button>
+                                    <button type="button" class="btn btn-warning">修改</button>
+                                </div>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                     <nav class="text-center">
                         <ul class="pagination">
-                            <li>
+                            <li th:with="eachPage = 0..${page.pages}">
                                 <a href="#">&laquo;</a>
                             </li>
-                            <li>
+                            <li th:each="oneEnvNode,itemStat:${eachPage}>
                                 <a href="#">1</a>
                             </li>
                             <li>

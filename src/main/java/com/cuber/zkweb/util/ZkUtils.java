@@ -162,6 +162,7 @@ public class ZkUtils {
                 if(allPages != null && allPages.size() >= page.getCurPageIndex()){
                     pageNodeNames = allPages.get(page.getCurPageIndex() - 1);
                 }
+                page.setPages(allPages.size());
             }
             List<ZooKeeperProsNode> result = Lists.newArrayList();
             if(pageNodeNames != null){
@@ -169,7 +170,8 @@ public class ZkUtils {
                         node -> result.add(ZkUtils.getNode(path + "/" + node,zkClient)));
             }
             page.setZooKeeperProsNodes(result);
-            page.setCount(nodeNames.size());
+            page.setCount(result.size());
+
         }
         return page;
     }

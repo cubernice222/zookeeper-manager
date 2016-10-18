@@ -32,7 +32,7 @@ public class BaseController {
         ZooKeeperProjectNode projectNode = (ZooKeeperProjectNode)ZkUtils.getNode(ZooKeeperConst.PUBLICCONFIG,zkClient);
         Page page = new Page();
         page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG ,page,zkClient);
-        model.put("pageVar",page.getZooKeeperProsNodes());
+        model.put("page",page.getZooKeeperProsNodes());
         model.put("adb","adc");
         model.put("projectNode",projectNode);
         return new ModelAndView("index").addAllObjects(model);

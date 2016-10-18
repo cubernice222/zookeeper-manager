@@ -11,6 +11,16 @@ public class Page {
     private int count;//总数目
     private int pageCount = 10;//分页数目
     private int curPageIndex = 1;//当前页码
+    private int pages;
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
     private List<ZooKeeperProsNode> zooKeeperProsNodes;
 
     public int getCount() {
