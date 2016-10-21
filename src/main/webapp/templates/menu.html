@@ -4,29 +4,95 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link href="/css/menu.css" rel="stylesheet"/>
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
     </head>
     <body>
         <ul id="menu">
             <li>
                 <a href="#" class="drop">zookeeper properties 配置中心</a>
                 <div class="col_1">
-
                     <ul class="greybox">
-                        <li><a href="#">FreelanceSwitch</a></li>
-                        <li><a href="#">Creattica</a></li>
-                        <li><a href="#">WorkAwesome</a></li>
-                        <li><a href="#">Mac Apps</a></li>
-                        <li><a href="#">Web Apps</a></li>
+                        <li sec:authorize="hasRole('ROLE_admin')"><a href="accSpkey()">统一密钥</a></li>
+                        <li><a href="accPublicConfig()">公共配置</a></li>
+                        <li sec:authorize="hasRole('ROLE_admin')"><a href="directEnvManage()">环境管理</a></li>
                     </ul>
-
                 </div>
             </li>
-            <li>
-                <a href="#" class="drop">zookeeper 密钥</a>
+            <li th:each="oneEnvNode,itemStat:${accessEnvs}">
+                <a href="showSubProject(${oneEnvNode.parentPath},${oneEnvNode.name})" class="drop" th:text="${oneEnvNode.desc}"></a>
             </li>
-            <li>
-                <a href="#" class="drop">zookeeper 密钥</a>
+            <li class="menu_right">
+                <a href="#" class="drop">当前用户</a>
+                <div class="dropdown_1column align_right">
+                    <div class="col_1">
+                        <p class="black_box" th:text="welcome ${#authentication.name}"></p>
+                    </div>
+                </div>
             </li>
         </ul>
+        <!-- todo add navigation -->
+        <div id="showHtml">
+            <h2>欢迎~!  zookeeper 配置中心</h2>
+        </div>
     </body>
+    <script type="application/javascript">
+        function accSpkey(){
+            $('#showHtml').fadeOut();
+            $.ajax({
+                type: "POST",
+                url: "${ctx}/show_sp_key.htm",
+                success: function(result) {
+                    $('#showHtml').html(result);
+                    $('#showHtml').fadeIn();
+                }
+            });
+        }
+
+        function accPublicConfig(){
+            $('#showHtml').fadeOut();
+            $.ajax({
+                type: "POST",
+                url: "${ctx}/show_pub_conf.htm",
+                success: function(result) {
+                    $('#showHtml').html(result);
+                    $('#showHtml').fadeIn();
+                }
+            });
+        }
+
+        function directEnvManage(){
+            $('#showHtml').fadeOut();
+            $.ajax({
+                type: "POST",
+                url: "${ctx}/show_all_env.htm",
+                success: function(result) {
+                    $('#showHtml').html(result);
+                    $('#showHtml').fadeIn();
+                }
+
+            });
+        }
+
+        function showSubProject(parentPath, name){
+            $('#showHtml').fadeOut();
+            var zkpros = returnZkprosJson(name,parentPath,"1",'anything');
+            $.ajax({
+                type: "POST",
+                url: "${ctx}/show_sub_project.htm",
+                data: zkpros,
+                success: function(result) {
+                    $('#showHtml').html(result);
+                    $('#showHtml').fadeIn();
+                }
+            });
+        }
+        function returnZkprosJson(name,parentPath,type,desc){
+            var zkpros = JSON.stringify({});
+            zkpros.name = name;
+            zkpros.parentPath = parentPath;
+            zkpros.type = type;
+            zkpros.desc = desc;
+            return zkpros;
+        }
+    </script>
 </html>
