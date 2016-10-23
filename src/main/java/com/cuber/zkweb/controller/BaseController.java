@@ -25,7 +25,7 @@ public class BaseController {
     @Autowired
     private ZkClient zkClient;
 
-    @GetMapping("/index")
+    @GetMapping("/index.htm")
     public ModelAndView index(Map<String, Object> model){
         List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
         model.put("accessEnvs",accessEnvs);
@@ -33,9 +33,8 @@ public class BaseController {
         Page page = new Page();
         page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG ,page,zkClient);
         model.put("page",page.getZooKeeperProsNodes());
-        model.put("adb","adc");
         model.put("projectNode",projectNode);
-        return new ModelAndView("index").addAllObjects(model);
+        return new ModelAndView("menu").addAllObjects(model);
     }
 
     @RequestMapping("/login.htm")

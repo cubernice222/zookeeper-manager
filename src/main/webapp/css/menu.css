@@ -273,3 +273,17 @@ body, ul, li {
     padding:4px 6px 4px 6px;
     margin:0px 0px 4px 0px;
 }
+
+.mydiv{
+    list-style:none;
+    width:940px;
+    margin:30px auto 0px auto;
+    height:43px;
+    padding:0px 20px 0px 20px;
+
+    /* Rounded Corners */
+
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}

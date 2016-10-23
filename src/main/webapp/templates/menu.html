@@ -4,17 +4,17 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link href="/css/menu.css" rel="stylesheet"/>
-        <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="/js/jquery-2.1.4.min.js"></script>
     </head>
     <body>
         <ul id="menu">
             <li>
-                <a href="#" class="drop">zookeeper properties 配置中心</a>
-                <div class="col_1">
+                <a href="#" class="drop">配置中心</a>
+                <div class="dropdown_1column">
                     <ul class="greybox">
-                        <li sec:authorize="hasRole('ROLE_admin')"><a href="accSpkey()">统一密钥</a></li>
-                        <li><a href="accPublicConfig()">公共配置</a></li>
-                        <li sec:authorize="hasRole('ROLE_admin')"><a href="directEnvManage()">环境管理</a></li>
+                        <li sec:authorize="hasRole('ROLE_admin')"><a href="#" onclick="accSpkey()">统一密钥</a></li>
+                        <li><a href="#" onclick="accPublicConfig()">公共配置</a></li>
+                        <li sec:authorize="hasRole('ROLE_admin')"><a href="#" onclick="accSpkey()">环境管理</a></li>
                     </ul>
                 </div>
             </li>
@@ -25,14 +25,21 @@
                 <a href="#" class="drop">当前用户</a>
                 <div class="dropdown_1column align_right">
                     <div class="col_1">
-                        <p class="black_box" th:text="welcome ${#authentication.name}"></p>
+                        <p class="black_box" >123344</p>
                     </div>
                 </div>
             </li>
         </ul>
         <!-- todo add navigation -->
-        <div id="showHtml">
-            <h2>欢迎~!  zookeeper 配置中心</h2>
+        <div id="context" class="mydiv">
+            <div>
+                <ol class="breadcrumb">
+                    <li><a href="#">配置中心</a></li>
+                </ol>
+            </div>
+            <div id="showHtml">
+                <h2 >欢迎~!  zookeeper 配置中心</h2>
+            </div>
         </div>
     </body>
     <script type="application/javascript">
@@ -40,31 +47,33 @@
             $('#showHtml').fadeOut();
             $.ajax({
                 type: "POST",
-                url: "${ctx}/show_sp_key.htm",
+                url: "[[@{/showSpkey.htm}]]",
                 success: function(result) {
                     $('#showHtml').html(result);
                     $('#showHtml').fadeIn();
                 }
             });
+            return false;
         }
 
         function accPublicConfig(){
             $('#showHtml').fadeOut();
             $.ajax({
                 type: "POST",
-                url: "${ctx}/show_pub_conf.htm",
+                url: "/show_pub_conf.htm",
                 success: function(result) {
                     $('#showHtml').html(result);
                     $('#showHtml').fadeIn();
                 }
             });
+            return false;
         }
 
         function directEnvManage(){
             $('#showHtml').fadeOut();
             $.ajax({
                 type: "POST",
-                url: "${ctx}/show_all_env.htm",
+                url: "/show_all_env.htm",
                 success: function(result) {
                     $('#showHtml').html(result);
                     $('#showHtml').fadeIn();
@@ -78,8 +87,9 @@
             var zkpros = returnZkprosJson(name,parentPath,"1",'anything');
             $.ajax({
                 type: "POST",
-                url: "${ctx}/show_sub_project.htm",
+                url: "123456",
                 data: zkpros,
+                dataType: "json",
                 success: function(result) {
                     $('#showHtml').html(result);
                     $('#showHtml').fadeIn();

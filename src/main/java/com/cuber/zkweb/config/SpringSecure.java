@@ -39,6 +39,7 @@ public class SpringSecure extends WebSecurityConfigurerAdapter {
                 .fullyAuthenticated().and().formLogin().loginPage("/login.htm")
                 .failureUrl("/login.htm?error").loginProcessingUrl("/login")  //very import add
                 .permitAll().and().logout().permitAll();
+        http.csrf().disable();
     }
 
 
