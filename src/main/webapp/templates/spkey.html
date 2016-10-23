@@ -5,7 +5,7 @@
             <div class="input-group">
                 <span class="input-group-addon">3DES加密密钥</span>
                 <input type="text" class="form-control" name="spkey" id="spkey" th:value="${spkey}">
-                <button type="button" class="btn input-group-addon" onclick="modifySpkey()">修改</button>
+                <span class="btn input-group-addon" onclick="modifySpkey()">修改</span>
             </div>
         </form>
     </div>
@@ -16,10 +16,9 @@
                 url: "[[@{/modifySpkey.json}]]",
                 data:{"spkey": $('#spkey').val()},
                 dataType: "json",
-                error: function(msg) { alert("error"); },
-                complete: function(msg) { alert("complete");},
+                error: function(msg) {  },
+                complete: function(msg) { },
                 success: function(msg) {
-                    alert(msg);
                     alert("修改成功");
                 }
             });
