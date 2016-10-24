@@ -21,24 +21,23 @@
             <form id="crud-form">
                 <div class="input-group">
                     <span class="input-group-addon">节点名称:</span>
-                    <input type="text" class="form-control" name="zkpros.name" id="name">
-                    <input type="hidden" class="form-control" name="zkpros.type" value="4">
+                    <input type="text" class="form-control" name="name" id="name">
+                    <input type="hidden" class="form-control" name="type" value="4">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon">节点描述:</span>
-                    <input type="hidden" class="form-control" name="zkpros.type" th:value="${curParentPath}">
-                    <input type="text" class="form-control" name="zkpros.desc" id="desc">
+                    <input type="hidden" id="parentPath" class="form-control" name="parentPath" th:value="${curParentPath}">
+                    <input type="text" class="form-control" name="desc" id="desc">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon">节点值域:</span>
-                    <input type="hidden" name="editType" value="add"/>
-                    <input type="text" class="form-control" name="zkpros.value" id="value">
+                    <input type="hidden" name="editType" value="add" id="editType"/>
+                    <input type="text" class="form-control" name="value" id="value">
                 </div>
                 <div class="input-group">
                         <span class="input-group-addon">
-                            <input type="hidden" name="zkpros.mask" id="mask"/>
+                            <input type="hidden" name="mask" id="mask" value="false"/>
                             <input type="checkbox" name="maskCheck" id="maskCheck" onchange="changeMask()">是否加密
-
                         </span>
                 </div>
             </form>
@@ -53,13 +52,16 @@
             <div id="grid_paging" style="margin:5px auto;"></div>
         </div>
         <script type="application/javascript">
+            function changeMask(){
+                $("#mask").val($("#maskCheck").prop("checked"));
+            }
             $(function () {
                 var colM = [
-                    { title: "节点名称", width: 130, dataIndx: "name" },
-                    { title: "节点描述", width: 100, dataIndx: "desc" },
-                    { title: "是否加密", width: 100, dataIndx: "mask",
+                    { title: "节点名称", width: 130, dataIndx: "name", editable:false},
+                    { title: "节点描述", width: 100, dataIndx: "desc" , editable:false},
+                    { title: "是否加密", width: 100, dataIndx: "mask", editable:false,
                         dataType: "bool",editor: { type: "checkbox", style: "margin:3px 5px;" }},//checkbox show
-                    { title: "节点值", width: 100, dataIndx: "value" }
+                    { title: "节点值", width: 100, dataIndx: "value" , editable:false}
                 ];
                 var dataModel = {
                     location: "remote",
@@ -74,12 +76,12 @@
                     dataModel: dataModel,
                     colModel: colM,
                     freezeCols: 0,
-                    pageModel: { type: "remote", rPP: 20, strRpp: "{0}" },
+                    pageModel: { type: "remote", rPP: 10, strRpp: "{0}" },
                     sortable: false,
                     wrap: false, hwrap: false,
                     numberCell:{resizable:false, width:30, title:""},
                     title: "公共节点管理",
-                    resizable: true
+                    resizable: false
                 }
                 pgConf.toolbar = {
                     items: [
@@ -90,14 +92,6 @@
                         { type: 'textbox', attr: 'placeholder="输入查找的关键字"', cls: "filterValue" },
                     ]
                 };
-                var $grid  = $("div#grid_paging").pqGrid(pgConf);
-                function editRow() {
-                    var rowIndx = getRowIndx();
-                    if (rowIndx != null) {
-                        var row = $grid.pqGrid('getRowData', {rowIndx: rowIndx});
-                        modifyProsSpan("edit",editzkprops);
-                    }
-                }
                 var modifyAddDialog = $( "#popup-dialog-crud" ).dialog({
                     resizable: false,
                     height: "auto",
@@ -107,33 +101,51 @@
                         "提交": ajaxEditAndrefresh
                     }
                 });
-                function addRow() {
-                    modifyAddDialog.dialog("open");
-                }
-                function modifyProsSpan(editType){;
-                    if(editType == 'add'){
-                        $('#popup-dialog-crud').find('input').each(function () {
-                            $(this).val('');
-                        });
-                    }else{
-
+                modifyAddDialog.dialog("close");
+                var $grid  = $("div#grid_paging").pqGrid(pgConf);
+                function editRow() {
+                    var rowIndx = getRowIndx();
+                    if (rowIndx != null) {
+                        var row = $grid.pqGrid('getRowData', {rowIndx: rowIndx});
+                        var $frm = $("form#crud-form");
+                        $frm.find('input[name="name"]').val(row.name);
+                        $frm.find('input[name="name"]').attr('readonly','readonly');
+                        $frm.find('input[name="desc"]').val(row.desc);
+                        $frm.find('input[name="mask"]').val(row.mask);
+                        $frm.find('input[name="maskCheck"]').prop('checked',row.mask);
+                        $frm.find('input[name="value"]').val(row.value);
+                        $("#editType").val("edit");
+                        modifyAddDialog.dialog("open");
                     }
                 }
 
+                function addRow() {
+                    var $frm = $("form#crud-form");
+                    $frm.find('input').each(function () {
+                        var inputName = $(this).attr('name');
+                        if("parentPath" != inputName && "type" != inputName){
+                            $(this).val('');
+                        }
+                    });
+                    $frm.find('input[name="mask"]').val(false);
+                    $frm.find('input[name="name"]').attr('readonly',false);
+                    $("#editType").val("add");
+                    modifyAddDialog.dialog("open");
+                }
                 function ajaxEditAndrefresh(){
                     var $frm = $("form#crud-form");
                     $.ajax({
                         type: "POST",
-                        url: "[[@{/modifypubConf.json}]]",
+                        url: "[[@{/modifyZkpros.json}]]",
                         dataType:"json",
-                        data:"1243",
+                        data:$frm.serialize(),
                         success: function(result) {
-                            $("div#grid_paging").pqGrid('reload');
-                            $( "#popup-dialog-crud" ).dialog('close');
-                            editzkprops.name = '';
-                            editzkprops.desc = '';
-                            editzkprops.value = '';
-                            editzkprops.mask = '';
+                            if(result.done){
+                                $grid.pqGrid('refreshDataAndView');
+                                $( "#popup-dialog-crud" ).dialog('close');
+                            }else{
+                                alert(result.message);
+                            }
                         }
                     });
                 }
@@ -141,16 +153,28 @@
                 function deleteRow() {
                     var rowIndx = getRowIndx();
                     if (rowIndx != null) {
-                        $grid.pqGrid("deleteRow", { rowIndx: rowIndx });
-                        $grid.pqGrid("setSelection", { rowIndx: rowIndx });
+                        var row = $grid.pqGrid('getRowData', {rowIndx: rowIndx});
+                        $.ajax({
+                            type: "POST",
+                            url: "[[@{/deletePros.json}]]",
+                            dataType:"json",
+                            data:{name:row.name, parentPath:$("#parentPath").val()},
+                            success: function(result) {
+                                if(result.done){
+                                    $grid.pqGrid('refreshDataAndView');
+                                    $( "#popup-dialog-crud" ).dialog('close');
+                                }else{
+                                    alert(result.message);
+                                }
+                            }
+                        });
                     }
                 }
                 function getRowIndx() {
                     var arr = $grid.pqGrid("selection", { type: 'row', method: 'getSelection' });
                     if (arr && arr.length > 0) {
                         return arr[0].rowIndx;
-                    }
-                    else {
+                    } else {
                         alert("Select a row.");
                         return null;
                     }

@@ -47,36 +47,7 @@ public class PublicConfController {
         page.setPageCount(pq_rpp);
         page.setCurPage(pq_curpage);
         System.out.println(request.getParameterMap());
-        List<ZooKeeperProsNode> data = new ArrayList<>();
         page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG,page,zkClient);
         return page;
-    }
-
-
-    @RequestMapping(value = "/modifypubConf.json",method = RequestMethod.POST)
-    public @ResponseBody ResponseMessage addPublicPros(HttpServletRequest request,
-                                         @RequestParam("editType") String editType){
-        Endecrypt endecrypt = new Endecrypt();
-        ResponseMessage responseMessage = new ResponseMessage();
-        ZooKeeperNode zkpros =  new ZooKeeperNode();
-        Map map = request.getParameterMap();
-        System.out.println(request.getParameterMap());
-        if(zkpros.isMask()){
-            zkpros.setValue(endecrypt.get3DESEncrypt(zkpros.getValue(),zkClient.readData(ZooKeeperConst.ZKSPKEY)));
-        }
-        String message = null;
-        if("add".equals(editType)){
-            responseMessage.setDone(ZkUtils.createNode(zkpros,zkClient));
-            message = "节点已存在";
-        }else{
-            responseMessage.setDone(ZkUtils.update(zkpros,zkClient));
-            message = "节点不存在";
-        }
-        if(responseMessage.isDone()){
-            responseMessage.setMessage("成功");
-        }else{
-            responseMessage.setMessage(message);
-        }
-        return responseMessage;
     }
 }

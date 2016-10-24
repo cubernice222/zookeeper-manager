@@ -161,7 +161,7 @@ public class ZkUtils {
                 if(allPages != null && allPages.size() >= page.getCurPage()){
                     pageNodeNames = allPages.get(page.getCurPage() - 1);
                 }
-                page.setPages(allPages.size());
+                page.setTotalRecords(nodeNames.size());
             }
             List<ZooKeeperProsNode> result = Lists.newArrayList();
             if(pageNodeNames != null){
@@ -169,7 +169,6 @@ public class ZkUtils {
                         node -> result.add(ZkUtils.getNode(path + "/" + node,zkClient)));
             }
             page.setData(result);
-            page.setTotalRecords(result.size());
 
         }
         return page;
@@ -201,11 +200,11 @@ public class ZkUtils {
         return null;
     }
 
-    public static void haveRightAccessNode(ZkClient zkClient, ZooKeeperProsNode node){
+    public static boolean haveRightAccessNode(ZkClient zkClient, ZooKeeperProsNode node){
         boolean have = false;
         if(node != null && zkClient != null){
             String parentPath = node.getParentPath();
-            if(Strings.isNullOrEmpty(parentPath)){
+            if(!Strings.isNullOrEmpty(parentPath)){
                 if(!(parentPath.indexOf(ZooKeeperConst.PUBLICCONFIG) > -1)){
                     ZooKeeperEnviromentNode env = getBySubNodePath(parentPath,zkClient);
                     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -220,9 +219,7 @@ public class ZkUtils {
 
             }
         }
-        if(!have){
-            throw new AccessDeniedException("has no right access");
-        }
+        return have;
     }
 
     public static ZooKeeperEnviromentNode getBySubNodePath(String nodePath,ZkClient zkClient){

@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -33,126 +31,51 @@ public class NodeController {
     private String spKey;
 
 
-    @RequestMapping("/postNode.json")
-    public ResponseMessage postNode(HttpServletRequest request,ZooKeeperProsNode node){
-        ZkUtils.haveRightAccessNode(zkClient,node);
+    @RequestMapping(value = "/deletePros.json",method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseMessage deletePros(HttpServletRequest request,
+                               ZooKeeperNode zkpros){
         ResponseMessage responseMessage = new ResponseMessage();
-        node = getRightZknode(request,node);
-
-        try{
-            if(!zkClient.exists(node.getParentPath() + "/" + node.getName())){
-                ZkUtils.createNode(node,zkClient);
-            }else{
-                ZkUtils.update(node,zkClient);
-            }
-            responseMessage.setDone(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            responseMessage.setMessage(e.getMessage());
-        }
-
-        return responseMessage;
-    }
-
-    private ZooKeeperProsNode getRightZknode(HttpServletRequest request,ZooKeeperProsNode node){
-        ZkUtils.haveRightAccessNode(zkClient,node);
-        ZooKeeperProsNode returnObj = node;
-        switch (node.getType()) {
-            case "1":
-                returnObj = ZkUtils.convert(ZooKeeperEnviromentNode.class, request);
-                break;
-            case "2":
-                returnObj = ZkUtils.convert(ZooKeeperProjectNode.class, request);
-                break;
-            case "3":
-                returnObj = ZkUtils.convert(ZooKeeperFolderNode.class, request);
-                break;
-            default:
-                returnObj = ZkUtils.convert(ZooKeeperNode.class, request);
-        }
-        return returnObj;
-    }
-
-    @RequestMapping("/deleteNode.json")
-    public ResponseMessage deleteNode(ZooKeeperProsNode node){
-        ZkUtils.haveRightAccessNode(zkClient,node);
-        ResponseMessage responseMessage = new ResponseMessage();
-        try{
-            if(zkClient.exists(node.getParentPath() + "/" + node.getName())){
-                ZkUtils.deleteNode(node,zkClient );
+        if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){
+            if(ZkUtils.deleteNode(zkpros,zkClient)){
                 responseMessage.setDone(true);
+            }else{
+                responseMessage.setMessage("节点不存在");
             }
-            responseMessage.setMessage("节点不存在，不能删除");
-        }catch (Exception e){
-            e.printStackTrace();
-            responseMessage.setMessage(e.getMessage());
-        }
-        return responseMessage;
-    }
-
-    @RequestMapping("/getEncrypt.json")
-    public ResponseMessage getEncrypt(String value){
-
-        ResponseMessage responseMessage = new ResponseMessage();
-        Map<String,String> map = new HashMap<>();
-        String maskKey = spKey;
-        try{
-            if(zkClient.exists(ZooKeeperConst.ZKSPKEY)){
-                maskKey = zkClient.readData(ZooKeeperConst.ZKSPKEY);
-            }
-            Endecrypt test = new Endecrypt();
-            String mask = test.get3DESEncrypt(value, maskKey);
-            map.put("maskKey",maskKey);
-            map.put("mask",mask);
-            Gson gson =  new Gson();
-            responseMessage.setTransJsonValue(gson.toJson(map));
-            responseMessage.setDone(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            responseMessage.setMessage(e.getMessage());
-        }
-        return responseMessage;
-    }
-
-    @RequestMapping("/getPage.json")
-    public Page getChildrenNode(@RequestParam(value="path")String path, Page page){
-        ZooKeeperProsNode node = ZkUtils.getNode(path,zkClient);
-        ZkUtils.haveRightAccessNode(zkClient,node);
-        try{
-            Page returnPage = ZkUtils.getPage(path,page,zkClient);
-            return returnPage;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @RequestMapping("/postCopy.json")
-    public ResponseMessage copyPath(@RequestParam(value="overWriten")boolean overWriten,
-                                    ZooKeeperProsNode node, @RequestParam(value="path")String path){
-        ZkUtils.haveRightAccessNode(zkClient,node);
-        ResponseMessage responseMessage = new ResponseMessage();
-        try{
-            ZkUtils.copyNode(node,zkClient,path,overWriten);
-            responseMessage.setDone(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            responseMessage.setMessage(e.getMessage());
-        }
-        return responseMessage;
-    }
-
-    @RequestMapping("/getPermissionEnv.json")
-    public ResponseMessage getPermissionEnv(){
-        ResponseMessage responseMessage = new ResponseMessage();
-        List<ZooKeeperEnviromentNode> currentUserNode = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
-        if(currentUserNode != null && currentUserNode.size() > 0){
-            Gson gson = new Gson();
-            responseMessage.setDone(true);
-            responseMessage.setTransJsonValue(gson.toJson(currentUserNode));
         }else{
-            responseMessage.setMessage("不能找到可授权的环境节点");
+            responseMessage.setMessage("没有权限做此操作");
         }
+        return responseMessage;
+    }
+
+    @RequestMapping(value = "/modifyZkpros.json",method = RequestMethod.POST)
+    public @ResponseBody ResponseMessage addPublicPros(HttpServletRequest request,
+                                                       ZooKeeperNode zkpros,
+                                                       @RequestParam("editType") String editType){
+        ZkUtils.haveRightAccessNode(zkClient,zkpros);
+        Endecrypt endecrypt = new Endecrypt();
+        ResponseMessage responseMessage = new ResponseMessage();
+        if(zkpros.isMask()){
+            zkpros.setValue(endecrypt.get3DESEncrypt(zkpros.getValue(),zkClient.readData(ZooKeeperConst.ZKSPKEY)));
+        }
+        String message = null;
+        if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){
+            if("add".equals(editType)){
+                responseMessage.setDone(ZkUtils.createNode(zkpros,zkClient));
+                message = "节点已存在";
+            }else{
+                responseMessage.setDone(ZkUtils.update(zkpros,zkClient));
+                message = "节点不存在";
+            }
+            if(responseMessage.isDone()){
+                responseMessage.setMessage("成功");
+            }else{
+                responseMessage.setMessage(message);
+            }
+        }else{
+            responseMessage.setMessage("没有权限做此操作");
+        }
+
         return responseMessage;
     }
 
