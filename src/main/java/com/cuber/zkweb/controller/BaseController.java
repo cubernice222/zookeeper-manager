@@ -29,12 +29,7 @@ public class BaseController {
     public ModelAndView index(Map<String, Object> model){
         List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
         model.put("accessEnvs",accessEnvs);
-        ZooKeeperProjectNode projectNode = (ZooKeeperProjectNode)ZkUtils.getNode(ZooKeeperConst.PUBLICCONFIG,zkClient);
-        Page page = new Page();
-        page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG ,page,zkClient);
-        model.put("page",page.getZooKeeperProsNodes());
-        model.put("projectNode",projectNode);
-        return new ModelAndView("menu").addAllObjects(model);
+        return new ModelAndView("index").addAllObjects(model);
     }
 
     @RequestMapping("/login.htm")

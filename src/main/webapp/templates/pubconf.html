@@ -3,68 +3,60 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="/css/menu.css" rel="stylesheet"/>
         <link rel="stylesheet" href="/css/pqgrid.min.css" />
-        <link rel="stylesheet" href="/css/base/jquery-ui-1.9.2.custom.min.css" />
         <!--PQ Grid Office theme-->
         <link rel="stylesheet" href="/css/themes/office/pqgrid.css" />
-        <script src="/js/jquery-2.1.4.min.js"></script>
-        <script src="/js/jquery-ui-1.9.2.custom.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
-        <script src="/js/pqgrid.min.js"></script>
+        <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+        <!--jQuery dependencies-->
+        <link rel="stylesheet" href="/css/base/jquery-ui.min.css" />
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+        <script src="/js/jquery-ui.min.js"></script>
+        <script src="/js/pqgrid.min.js"></script><!--PQ Grid files-->
     </head>
 
     <body>
-        <div id="grid_paging" style="margin:5px auto;"></div>
-        <input id="parentPath" th:value="${curParentPath}" type="hidden"/>
+        <div th:include="temp/menu">&nbsp;</div>
         <div id="popup-dialog-crud" style="display:none;">
             <form id="crud-form">
-                <table align="center">
-                    <tbody><tr>
-                        <td class="label">节点名称:</td>
-                        <td><input type="text" name="name">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">节点描述:</td>
-                        <td><input type="text" name="desc"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">是否加密:</td>
-                        <td>
-                            <select name="mask">
-                                <option value="true">是</option>
-                                <option value="false">否</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">节点值:</td>
-                        <td><input type="text" name="value"></td>
-                    </tr>
-                    </tbody></table>
+                <div class="input-group">
+                    <span class="input-group-addon">节点名称:</span>
+                    <input type="text" class="form-control" name="zkpros.name" id="name">
+                    <input type="hidden" class="form-control" name="zkpros.type" value="4">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">节点描述:</span>
+                    <input type="hidden" class="form-control" name="zkpros.type" th:value="${curParentPath}">
+                    <input type="text" class="form-control" name="zkpros.desc" id="desc">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">节点值域:</span>
+                    <input type="hidden" name="editType" value="add"/>
+                    <input type="text" class="form-control" name="zkpros.value" id="value">
+                </div>
+                <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="hidden" name="zkpros.mask" id="mask"/>
+                            <input type="checkbox" name="maskCheck" id="maskCheck" onchange="changeMask()">是否加密
+
+                        </span>
+                </div>
             </form>
         </div>
+        <div style="padding: 100px 100px 10px;" class="mydiv">
+            <div>
+                <ol class="breadcrumb">
+                    <li><a th:href="@{/index.htm}">配置中心</a></li>
+                    <li><a th:href="@{/showpubconf.htm}">公共配置</a></li>
+                </ol>
+            </div>
+            <div id="grid_paging" style="margin:5px auto;"></div>
+        </div>
         <script type="application/javascript">
-            var editzkprops ={"parentPath": "${curParentPath}","type": "3"};//修改之前的value
             $(function () {
-                var ajaxObj = {
-                    dataType: "JSON",
-                    beforeSend: function () {
-                        this.pqGrid("showLoading");
-                    },
-                    complete: function () {
-                        this.pqGrid("hideLoading");
-                    },
-                    error: function () {
-                        this.pqGrid("rollback");
-                    }
-                };// operation pggrid
                 var colM = [
                     { title: "节点名称", width: 130, dataIndx: "name" },
-                    { title: "节点父地址", width: 190, dataIndx: "parentPath", },
                     { title: "节点描述", width: 100, dataIndx: "desc" },
-                    { title: "节点类型", width: 100, dataIndx: "type"},
                     { title: "是否加密", width: 100, dataIndx: "mask",
                         dataType: "bool",editor: { type: "checkbox", style: "margin:3px 5px;" }},//checkbox show
                     { title: "节点值", width: 100, dataIndx: "value" }
@@ -72,98 +64,78 @@
                 var dataModel = {
                     location: "remote",
                     dataType: "JSON",
-                    method: "GET",
-                    url: "/show_pub_pros.json",
+                    method: "POST",
+                    url: "/showAllPros.json",
                     getData: function (dataJSON) {
                         return { curPage: dataJSON.curPage, totalRecords: dataJSON.totalRecords, data: dataJSON.data };
                     }
                 }
-                var pgConf = { width: 900, height: 400,
+                var pgConf = { width: 750 , height: 400,
                     dataModel: dataModel,
                     colModel: colM,
-                    freezeCols: 2,
+                    freezeCols: 0,
                     pageModel: { type: "remote", rPP: 20, strRpp: "{0}" },
                     sortable: false,
                     wrap: false, hwrap: false,
-                    numberCell:{resizable:true, width:30, title:""},
+                    numberCell:{resizable:false, width:30, title:""},
                     title: "公共节点管理",
                     resizable: true
                 }
                 pgConf.toolbar = {
-                    cls: "pq-toolbar-search",
                     items: [
                         { type: 'button', label: '增加', listeners: [{ click: addRow}], icon: 'ui-icon-plus' },
                         { type: 'button', label: '编辑', listeners: [{ click: editRow}], icon: 'ui-icon-pencil' },
-                        { type: 'button', label: '删除', listeners: [{ click: deleteRow}], icon: 'ui-icon-minus' }
+                        { type: 'button', label: '删除', listeners: [{ click: deleteRow}], icon: 'ui-icon-minus' },
+                        { type: "<span style='margin:5px;'></span>" },
+                        { type: 'textbox', attr: 'placeholder="输入查找的关键字"', cls: "filterValue" },
                     ]
                 };
                 var $grid  = $("div#grid_paging").pqGrid(pgConf);
-
-                $("#popup-dialog-crud").dialog({ width: 400, modal: true,
-                    open: function () { $(".ui-dialog").position({ of: "#grid_paging" }); },
-                    autoOpen: false
-                });
-
                 function editRow() {
                     var rowIndx = getRowIndx();
                     if (rowIndx != null) {
-
                         var row = $grid.pqGrid('getRowData', {rowIndx: rowIndx});
-
-                        var $frm = $("form#crud-form");
-                        $frm.find("input[name='name']").val(row[0]);
-                        $frm.find("input[name='desc']").val(row[2]);
-                        $frm.find("input[name='mask']").val(row[4]);
-                        $frm.find("input[name='value']").val(row[5]);
-
-                        $("#popup-dialog-crud").dialog({ title: "编辑节点 (" + (rowIndx + 1) + ")", buttons: {
-                            Update: function () {
-                                //update row.
-                                var row = [];
-                                row[0] = $frm.find("input[name='name']").val();
-                                row[1] = $frm.find("input[name='parentPath']").val();
-                                row[2] = $frm.find("input[name='desc']").val();
-                                row[3] = $frm.find("input[name='type']").val();
-                                row[4] = $frm.find("input[name='mask']").val();
-                                row[5] = $frm.find("input[name='value']").val();
-
-                                $grid.pqGrid('updateRow', { rowIndx: rowIndx, row: row });
-
-                                $(this).dialog("close");
-                            },
-                            Cancel: function () {
-                                $(this).dialog("close");
-                            }
-                        }
-                        }).dialog("open");
+                        modifyProsSpan("edit",editzkprops);
                     }
                 }
-                //append Row
-                function addRow() {
-
-                    var $frm = $("form#crud-form");
-                    $frm.find("input").val("");
-
-                    $("#popup-dialog-crud").dialog({ title: "新增家电", buttons: {
-                        Add: function () {
-                            var row = [];
-                            //save the record in DM.data.
-                            row[0] = $frm.find("input[name='name']").val();
-                            row[1] = $frm.find("input[name='symbol']").val();
-                            row[2] = $frm.find("input[name='price']").val();
-                            row[3] = $frm.find("input[name='change']").val();
-                            row[5] = $frm.find("input[name='pchange']").val();
-                            row[6] = $frm.find("input[name='volume']").val();
-
-                            $grid.pqGrid('addRow', { rowData: row });
-                            $(this).dialog("close");
-                        },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        }
+                var modifyAddDialog = $( "#popup-dialog-crud" ).dialog({
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        "提交": ajaxEditAndrefresh
                     }
+                });
+                function addRow() {
+                    modifyAddDialog.dialog("open");
+                }
+                function modifyProsSpan(editType){;
+                    if(editType == 'add'){
+                        $('#popup-dialog-crud').find('input').each(function () {
+                            $(this).val('');
+                        });
+                    }else{
+
+                    }
+                }
+
+                function ajaxEditAndrefresh(){
+                    var $frm = $("form#crud-form");
+                    $.ajax({
+                        type: "POST",
+                        url: "[[@{/modifypubConf.json}]]",
+                        dataType:"json",
+                        data:"1243",
+                        success: function(result) {
+                            $("div#grid_paging").pqGrid('reload');
+                            $( "#popup-dialog-crud" ).dialog('close');
+                            editzkprops.name = '';
+                            editzkprops.desc = '';
+                            editzkprops.value = '';
+                            editzkprops.mask = '';
+                        }
                     });
-                    $("#popup-dialog-crud").dialog("open");
                 }
                 //delete Row.
                 function deleteRow() {
@@ -185,5 +157,6 @@
                 }
             });
         </script>
+
     </body>
 </html>

@@ -57,7 +57,6 @@ public class ZkUtils {
             return null;
         }
         String nodeJson =  zkClient.readData(pathNode);
-        System.out.println(pathNode);
         if(ZooKeeperConst.ZKSPKEY.equals(pathNode)){
             return null;
         }
@@ -70,7 +69,7 @@ public class ZkUtils {
                     break;
                 case "2":
                     returnObj = gson.fromJson(nodeJson,ZooKeeperProjectNode.class);
-                    break;
+                     break;
                 case "3":
                     returnObj = gson.fromJson(nodeJson,ZooKeeperFolderNode.class);
                     break;
@@ -159,8 +158,8 @@ public class ZkUtils {
                 page.setPageCount(-1);
             }else{
                 List<List<String>> allPages = Lists.partition(nodeNames,page.getPageCount());
-                if(allPages != null && allPages.size() >= page.getCurPageIndex()){
-                    pageNodeNames = allPages.get(page.getCurPageIndex() - 1);
+                if(allPages != null && allPages.size() >= page.getCurPage()){
+                    pageNodeNames = allPages.get(page.getCurPage() - 1);
                 }
                 page.setPages(allPages.size());
             }
@@ -169,8 +168,8 @@ public class ZkUtils {
                 pageNodeNames.stream().forEach(
                         node -> result.add(ZkUtils.getNode(path + "/" + node,zkClient)));
             }
-            page.setZooKeeperProsNodes(result);
-            page.setCount(result.size());
+            page.setData(result);
+            page.setTotalRecords(result.size());
 
         }
         return page;
@@ -181,7 +180,7 @@ public class ZkUtils {
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         Page page = ZkUtils.getPage(ZooKeeperConst.ZKROOT,null,zkClient);
         if(page != null){
-            List<ZooKeeperProsNode> allNode = page.getZooKeeperProsNodes();
+            List<ZooKeeperProsNode> allNode = page.getData();
             List<ZooKeeperEnviromentNode> left = new ArrayList<>();
             if(allNode != null && null != authorities && authorities.size() > 0){
                 StringBuilder sb =  new StringBuilder();

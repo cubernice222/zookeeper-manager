@@ -8,28 +8,13 @@ import java.util.List;
  * Created by cuber on 2016/10/13.
  */
 public class Page {
-    private int count;//总数目
+    private int totalRecords;//总数目
     private int pageCount = 10;//分页数目
-    private int curPageIndex = 1;//当前页码
+    private int curPage = 1;//当前页码
     private int pages;
 
-    public int getPages() {
-        return pages;
-    }
+    private List<ZooKeeperProsNode> data;
 
-    public void setPages(int pages) {
-        this.pages = pages;
-    }
-
-    private List<ZooKeeperProsNode> zooKeeperProsNodes;
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 
     public int getPageCount() {
         return pageCount;
@@ -39,19 +24,35 @@ public class Page {
         this.pageCount = pageCount;
     }
 
-    public int getCurPageIndex() {
-        return curPageIndex;
+    public int getTotalRecords() {
+        return totalRecords;
     }
 
-    public void setCurPageIndex(int curPageIndex) {
-        this.curPageIndex = curPageIndex;
+    public void setTotalRecords(int totalRecords) {
+        this.totalRecords = totalRecords;
     }
 
-    public List<ZooKeeperProsNode> getZooKeeperProsNodes() {
-        return zooKeeperProsNodes;
+    public int getCurPage() {
+        return curPage;
     }
 
-    public void setZooKeeperProsNodes(List<ZooKeeperProsNode> zooKeeperProsNodes) {
-        this.zooKeeperProsNodes = zooKeeperProsNodes;
+    public void setCurPage(int curPage) {
+        this.curPage = curPage;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public List<ZooKeeperProsNode> getData() {
+        return data;
+    }
+
+    public void setData(List<ZooKeeperProsNode> data) {
+        this.data = data;
     }
 }

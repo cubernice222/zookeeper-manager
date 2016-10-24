@@ -13,6 +13,7 @@ body, ul, li {
     margin:30px auto 0px auto;
     height:43px;
     padding:0px 20px 0px 20px;
+    z-index: 100;
 
     /* Rounded Corners */
 
@@ -110,11 +111,11 @@ body, ul, li {
     border-radius: 0px 5px 5px 5px;
 }
 
-.dropdown_1column {width: 140px;}
-.dropdown_2columns {width: 280px;}
-.dropdown_3columns {width: 420px;}
-.dropdown_4columns {width: 560px;}
-.dropdown_5columns {width: 700px;}
+.dropdown_1column {width: 140px; z-index: 100}
+.dropdown_2columns {width: 280px; z-index: 100}
+.dropdown_3columns {width: 420px; z-index: 100}
+.dropdown_4columns {width: 560px; z-index: 100}
+.dropdown_5columns {width: 700px; z-index: 100}
 
 #menu li:hover .dropdown_1column,
 #menu li:hover .dropdown_2columns,
@@ -280,6 +281,7 @@ body, ul, li {
     margin:30px auto 0px auto;
     height:43px;
     padding:0px 20px 0px 20px;
+    z-index: 20;
 
     /* Rounded Corners */
 

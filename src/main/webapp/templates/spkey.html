@@ -1,14 +1,30 @@
 ﻿<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-    <div style="padding: 100px 100px 10px;">
-        <form class="bs-example bs-example-form" role="form">
-            <div class="input-group">
-                <span class="input-group-addon">3DES加密密钥</span>
-                <input type="text" class="form-control" name="spkey" id="spkey" th:value="${spkey}">
-                <span class="btn input-group-addon" onclick="modifySpkey()">修改</span>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <link href="/css/menu.css" rel="stylesheet"/>
+        <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+        <script src="/js/jquery-1.8.3.min.js"></script>
+        <script src="/js/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <div th:include="temp/menu">&nbsp;</div>
+        <div style="padding: 100px 100px 10px;" class="mydiv">
+            <div>
+                <ol class="breadcrumb">
+                    <li><a th:href="@{/index.htm}">配置中心</a></li>
+                    <li><a th:href="@{/showSpkey.htm}">统一密钥</a></li>
+                </ol>
             </div>
-        </form>
-    </div>
+            <form class="bs-example bs-example-form" role="form">
+                <div class="input-group">
+                    <span class="input-group-addon">3DES加密密钥</span>
+                    <input type="text" class="form-control" name="spkey" id="spkey" th:value="${spkey}">
+                    <span class="btn input-group-addon" onclick="modifySpkey()">修改</span>
+                </div>
+            </form>
+        </div>
+    </body>
     <script type="application/javascript">
         function modifySpkey(){
             $.ajax({

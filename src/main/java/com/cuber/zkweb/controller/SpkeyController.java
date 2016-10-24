@@ -1,8 +1,10 @@
 package com.cuber.zkweb.controller;
 
 import com.cuber.java.zkpros.constvar.ZooKeeperConst;
+import com.cuber.java.zkpros.model.ZooKeeperEnviromentNode;
 import com.cuber.zkweb.model.Page;
 import com.cuber.zkweb.model.ResponseMessage;
+import com.cuber.zkweb.util.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 /**
  * Created by cuber on 2016/10/22.
  */
@@ -21,8 +25,10 @@ public class SpkeyController {
     @Autowired
     private ZkClient zkClient;
 
-    @RequestMapping(value = "/showSpkey.htm",method = RequestMethod.POST)
+    @RequestMapping(value = "/showSpkey.htm",method = RequestMethod.GET)
     public String showSpkeyValue(Model model){
+        List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
+        model.addAttribute("accessEnvs",accessEnvs);
         model.addAttribute("spkey",zkClient.readData(ZooKeeperConst.ZKSPKEY));
         return "spkey";
     }
