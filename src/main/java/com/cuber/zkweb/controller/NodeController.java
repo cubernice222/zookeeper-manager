@@ -56,7 +56,9 @@ public class NodeController {
         Endecrypt endecrypt = new Endecrypt();
         ResponseMessage responseMessage = new ResponseMessage();
         if(zkpros.isMask()){
-            zkpros.setValue(endecrypt.get3DESEncrypt(zkpros.getValue(),zkClient.readData(ZooKeeperConst.ZKSPKEY)));
+            String maskKey = zkClient.readData(ZooKeeperConst.ZKSPKEY);
+            zkpros.setMaskKey(maskKey);
+            zkpros.setValue(endecrypt.get3DESEncrypt(zkpros.getValue(),maskKey));
         }
         String message = null;
         if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){

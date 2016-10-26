@@ -127,23 +127,25 @@ public class ZkPropsResource {
     }
 
     public Properties accProject(String projectPath, ZkClient zkClient,Properties properties){
-        List<String> nodes = zkClient.getChildren(projectPath);
-        if(nodes != null && nodes.size() > 0){
-            String nodePath = null;
-            for (String nodeName: nodes
-                 ) {
-                nodePath = projectPath + "/" + nodeName;
-                ZooKeeperProsNode envObj = getZkObj(nodePath,zkClient,ZooKeeperProsNode.class);
-                if("3".equals(envObj.getType())){
-                    properties.putAll(accProject(nodePath,zkClient,properties));
-                }else{
-                    ZooKeeperNode nodeObj = getZkObj(nodePath,zkClient,ZooKeeperNode.class);
-                    String value = nodeObj.getValue();
-                    if(nodeObj.isMask()){
-                        Endecrypt decrypt = new Endecrypt();
-                        value = decrypt.get3DESDecrypt(value,nodeObj.getMaskKey());
+        if(zkClient.exists(projectPath)){
+            List<String> nodes = zkClient.getChildren(projectPath);
+            if(nodes != null && nodes.size() > 0){
+                String nodePath = null;
+                for (String nodeName: nodes
+                        ) {
+                    nodePath = projectPath + "/" + nodeName;
+                    ZooKeeperProsNode envObj = getZkObj(nodePath,zkClient,ZooKeeperProsNode.class);
+                    if("3".equals(envObj.getType())){
+                        properties.putAll(accProject(nodePath,zkClient,properties));
+                    }else{
+                        ZooKeeperNode nodeObj = getZkObj(nodePath,zkClient,ZooKeeperNode.class);
+                        String value = nodeObj.getValue();
+                        if(nodeObj.isMask()){
+                            Endecrypt decrypt = new Endecrypt();
+                            value = decrypt.get3DESDecrypt(value,nodeObj.getMaskKey());
+                        }
+                        properties.put(nodeName,value);
                     }
-                    properties.put(nodeName,value);
                 }
             }
         }
