@@ -4,10 +4,10 @@ package com.cuber.zkweb.model;
  * Created by cuber on 2016/10/27.
  */
 public enum  RoleEnum {
-    DEV("ROLE_Zkdev","开发环境"),
-    SIT("ROLE_Zksit","测试环境"),
-    PRE("ROLE_Zkpre","联调环境"),
-    PROD("ROLE_Zkprod","生产环境");
+    DEV("ROLE_Zkdev","开发"),
+    SIT("ROLE_Zksit","测试"),
+    PRE("ROLE_Zkpre","联调"),
+    PROD("ROLE_Zkprod","生产");
 
     private String accRole;
     private String desc;

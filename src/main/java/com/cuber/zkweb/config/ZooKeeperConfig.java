@@ -4,6 +4,7 @@ package com.cuber.zkweb.config;
 import com.cuber.java.zkpros.constvar.ZooKeeperConst;
 import com.cuber.java.zkpros.model.ZooKeeperEnviromentNode;
 import com.cuber.java.zkpros.model.ZooKeeperProjectNode;
+import com.cuber.zkweb.model.EnvEnum;
 import com.cuber.zkweb.util.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.CreateMode;
@@ -11,6 +12,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 
 /**
@@ -61,6 +64,7 @@ public class ZooKeeperConfig {
         ZooKeeperEnviromentNode sitNode = new ZooKeeperEnviromentNode();
         BeanUtils.copyProperties(devNode, sitNode);
         sitNode.setAccRule("ROLE_Zksit");
+        devNode.setAccKey(accKey);
         sitNode.setDesc("测试环境");
         sitNode.setName("sit");
 

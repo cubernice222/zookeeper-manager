@@ -38,7 +38,7 @@ public class PublicConfController {
                                          ){
         Page page = new Page();
         page.setPageCount(pq_rpp);
-        page.setCurPage(pq_curpage);
+        page.setCurPage(pq_curpage>0?pq_curpage:1);
         if(!filterMode){
             page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG,page,zkClient);
         }else{

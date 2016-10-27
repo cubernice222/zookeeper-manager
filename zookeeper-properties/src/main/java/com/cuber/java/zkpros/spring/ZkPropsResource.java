@@ -114,9 +114,9 @@ public class ZkPropsResource {
         if(null!=envObj){
             String acckey = envObj.getAccKey();
             if(null != acckey && acckey.equals(accCode)){
+                properties = accProject(ZooKeeperConst.PUBLICCONFIG,zkClient,properties);
                 properties = accProject(envPath + "/" +  projectName,
                         zkClient,properties);
-                properties = accProject(ZooKeeperConst.PUBLICCONFIG,zkClient,properties);
             }else{
                 throw new BeanInitializationException("access key [" + acckey + "] did't match");
             }

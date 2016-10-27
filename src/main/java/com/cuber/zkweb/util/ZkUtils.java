@@ -206,10 +206,11 @@ public class ZkUtils {
         });
         return hasRoles;
     }
-    public static boolean haveRightAccessNode(ZkClient zkClient, ZooKeeperProsNode node){
+    public static boolean haveRightAccessNode(ZkClient zkClient, ZooKeeperProsNode nodeCheck){
         boolean have = false;
-        if(node != null && zkClient != null){
-            String parentPath = node.getParentPath();
+        if(nodeCheck != null && zkClient != null){
+            String parentPath = nodeCheck.getParentPath();
+            ZooKeeperProsNode node = ZkUtils.getNode(parentPath + "/" + nodeCheck.getName(),zkClient);
             if(node instanceof ZooKeeperEnviromentNode){//如果是环境节点
                 ZooKeeperEnviromentNode envNode = (ZooKeeperEnviromentNode)node;
                 UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -220,6 +221,9 @@ public class ZkUtils {
                 }
             }else{
                 if(!Strings.isNullOrEmpty(parentPath)){
+                    if(ZooKeeperConst.ZKROOT.equals(parentPath)){//创建环境节点
+                        return true;
+                    }
                     if(!(parentPath.indexOf(ZooKeeperConst.PUBLICCONFIG) > -1)){
                         ZooKeeperEnviromentNode env = getBySubNodePath(parentPath,zkClient);
                         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

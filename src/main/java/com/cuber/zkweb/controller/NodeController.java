@@ -3,6 +3,7 @@ package com.cuber.zkweb.controller;
 import com.cuber.java.zkpros.constvar.ZooKeeperConst;
 import com.cuber.java.zkpros.model.*;
 import com.cuber.java.zkpros.utils.Endecrypt;
+import com.cuber.zkweb.model.EnvEnum;
 import com.cuber.zkweb.model.Page;
 import com.cuber.zkweb.model.ResponseMessage;
 import com.cuber.zkweb.util.ZkUtils;
@@ -32,22 +33,36 @@ public class NodeController {
 
 
     @RequestMapping(value = "/deletePros.json",method = RequestMethod.POST)
-    public @ResponseBody
-    ResponseMessage deletePros(HttpServletRequest request,
-                               ZooKeeperNode zkpros){
-        ResponseMessage responseMessage = new ResponseMessage();
-        if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){
-            if(ZkUtils.deleteNode(zkpros,zkClient)){
-                responseMessage.setDone(true);
+    public @ResponseBody ResponseMessage deletePros(HttpServletRequest request,
+                                                    ZooKeeperProsNode zkpros){
+        ResponseMessage responseMessage = validationDel(zkpros);
+        if(null == responseMessage.getMessage()){
+            if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){
+                if(ZkUtils.deleteNode(zkpros,zkClient)){
+                    responseMessage.setDone(true);
+                }else{
+                    responseMessage.setMessage("节点不存在");
+                }
             }else{
-                responseMessage.setMessage("节点不存在");
+                responseMessage.setMessage("没有权限做此操作");
             }
-        }else{
-            responseMessage.setMessage("没有权限做此操作");
         }
         return responseMessage;
     }
-
+    private ResponseMessage validationDel(ZooKeeperProsNode zkpros){
+        ResponseMessage responseMessage = new ResponseMessage();
+        String path = zkpros.getParentPath() + "/" + zkpros.getName();
+        if(ZooKeeperConst.PUBLICCONFIG.equals(path)){
+            responseMessage.setMessage("不能删除公共配置");
+        }
+        zkpros = ZkUtils.getNode(path,zkClient);
+        if("1".equals(zkpros.getType())){//环境
+            if(EnvEnum.isExist(zkpros.getName())){
+                responseMessage.setMessage("不能删除原始环境节点");
+            }
+        }
+        return responseMessage;
+    }
     @RequestMapping(value = "/modifyZkpros.json",method = RequestMethod.POST)
     public @ResponseBody ResponseMessage addPublicPros(HttpServletRequest request,
                                                        ZooKeeperNode zkpros,
