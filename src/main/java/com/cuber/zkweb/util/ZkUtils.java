@@ -2,6 +2,8 @@ package com.cuber.zkweb.util;
 
 import com.cuber.java.zkpros.constvar.ZooKeeperConst;
 import com.cuber.java.zkpros.model.*;
+import com.cuber.zkweb.model.ResponseMessage;
+import com.cuber.zkweb.model.RoleEnum;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -14,13 +16,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -84,41 +84,6 @@ public class ZkUtils {
         return null;
     }
 
-    public static <T> T convert(Class<T> targetClass, HttpServletRequest request) {
-        HashMap paraMap = new HashMap(request.getParameterMap());
-
-        try {
-            T e = targetClass.newInstance();
-            BeanWrapperImpl bean = new BeanWrapperImpl(e);
-            PropertyDescriptor[] propertyDescriptors = bean.getPropertyDescriptors();
-            PropertyDescriptor[] arr$ = propertyDescriptors;
-            int len$ = propertyDescriptors.length;
-
-            for(int i$ = 0; i$ < len$; ++i$) {
-                PropertyDescriptor property = arr$[i$];
-                String propertyName = property.getDisplayName();
-                Object value = paraMap.get(propertyName);
-                if(value instanceof String[]) {
-                    String[] tem = (String[])((String[])value);
-                    value = tem[0];
-                }
-
-                if(!"class".equals(propertyName)) {
-                    bean.setPropertyValue(propertyName, value == null?null:value.toString().trim());
-                }
-            }
-
-            return e;
-        } catch (InstantiationException var13) {
-            var13.printStackTrace();
-        } catch (IllegalAccessException var14) {
-            var14.printStackTrace();
-        }
-
-        return null;
-    }
-
-
     public static boolean deleteNode(ZooKeeperProsNode node, ZkClient zkClient){
         if(null != zkClient && node != null){
             String path = node.getParentPath() + "/" + node.getName();
@@ -173,6 +138,30 @@ public class ZkUtils {
         }
         return page;
     }
+    public static Page getFilter(String path, Page page, ZkClient zkClient,String filterValue){
+        List<ZooKeeperProsNode> result = Lists.newArrayList();
+        if(zkClient.exists(path)){
+            List<String> nodeNames = zkClient.getChildren(path);
+            List<ZooKeeperProsNode> allZkNodes = Lists.newArrayList();
+            nodeNames.stream().forEach(nodeName -> allZkNodes.add(ZkUtils.getNode(path + "/" + nodeName,zkClient)));
+            List<ZooKeeperProsNode> leftFilter = allZkNodes.stream().filter(
+                    zkNode->(zkNode.getName().indexOf(filterValue) !=-1 && zkNode.getDesc().indexOf(filterValue) !=-1)
+            ).collect(Collectors.toList());
+            result = leftFilter;
+            if(null == page){
+                page =  new Page();
+                page.setPageCount(-1);
+            }else{
+                List<List<ZooKeeperProsNode>> allPages = Lists.partition(leftFilter,page.getPageCount());
+                if(allPages != null && allPages.size() >= page.getCurPage()){
+                    result = allPages.get(page.getCurPage() - 1);
+                }
+                page.setTotalRecords(allPages.size());
+            }
+            page.setData(result);
+        }
+        return page;
+    }
 
     public static List<ZooKeeperEnviromentNode> getCurrentUserVisualEnvNode(ZkClient zkClient){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -200,23 +189,49 @@ public class ZkUtils {
         return null;
     }
 
+    public static List<RoleEnum> getCurUserHasRole(ZkClient zkClient){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        List<RoleEnum> hasRoles = Lists.newArrayList();
+        authorities.stream().forEach(authority -> {
+            if("ROLE_admin".equals(authority.getAuthority())) {
+                hasRoles.clear();
+                hasRoles.addAll(Arrays.asList(RoleEnum.values()));
+                return;
+            }else{
+                RoleEnum role = RoleEnum.getRoleByCode(authority.getAuthority());
+                if(role != null)
+                    hasRoles.add(role);
+            }
+        });
+        return hasRoles;
+    }
     public static boolean haveRightAccessNode(ZkClient zkClient, ZooKeeperProsNode node){
         boolean have = false;
         if(node != null && zkClient != null){
             String parentPath = node.getParentPath();
-            if(!Strings.isNullOrEmpty(parentPath)){
-                if(!(parentPath.indexOf(ZooKeeperConst.PUBLICCONFIG) > -1)){
-                    ZooKeeperEnviromentNode env = getBySubNodePath(parentPath,zkClient);
-                    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-                    if(authorities != null){
-                        have = authorities.stream().anyMatch(authority -> authority.getAuthority().equals(env.getAccRule()) ||
-                                authority.getAuthority().equals("ROLE_admin") );
-                    }
-                }else{
-                    have = true;
+            if(node instanceof ZooKeeperEnviromentNode){//如果是环境节点
+                ZooKeeperEnviromentNode envNode = (ZooKeeperEnviromentNode)node;
+                UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+                if(authorities != null){
+                    have = authorities.stream().anyMatch(authority -> authority.getAuthority().equals(envNode.getAccRule()) ||
+                            authority.getAuthority().equals("ROLE_admin") );
                 }
-
+            }else{
+                if(!Strings.isNullOrEmpty(parentPath)){
+                    if(!(parentPath.indexOf(ZooKeeperConst.PUBLICCONFIG) > -1)){
+                        ZooKeeperEnviromentNode env = getBySubNodePath(parentPath,zkClient);
+                        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+                        if(authorities != null){
+                            have = authorities.stream().anyMatch(authority -> authority.getAuthority().equals(env.getAccRule()) ||
+                                    authority.getAuthority().equals("ROLE_admin") );
+                        }
+                    }else{
+                        have = true;
+                    }
+                }
             }
         }
         return have;
@@ -233,7 +248,30 @@ public class ZkUtils {
         return null;
     }
 
-    public static void main(String[] args) {
-        System.out.println("123".substring(2));
+    public static void constructMenu(final Model model, ZkClient zkClient){
+        List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
+        model.addAttribute("accessEnvs",accessEnvs);
+    }
+
+    public static ResponseMessage editNode(ZooKeeperProsNode nodes, ZkClient zkClient, String editType){
+        ResponseMessage responseMessage = new ResponseMessage();
+        String message = null;
+        if(ZkUtils.haveRightAccessNode(zkClient,nodes)){
+            if("add".equals(editType)){
+                responseMessage.setDone(ZkUtils.createNode(nodes,zkClient));
+                message = "节点已存在";
+            }else{
+                responseMessage.setDone(ZkUtils.update(nodes,zkClient));
+                message = "节点不存在";
+            }
+            if(responseMessage.isDone()){
+                responseMessage.setMessage("成功");
+            }else{
+                responseMessage.setMessage(message);
+            }
+        }else{
+            responseMessage.setMessage("没有权限做此操作");
+        }
+        return responseMessage;
     }
 }

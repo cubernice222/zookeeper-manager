@@ -26,8 +26,7 @@ public class PublicConfController {
 
     @RequestMapping(value = "/showpubconf.htm",method = RequestMethod.GET)
     public String index(Model model){
-        List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
-        model.addAttribute("accessEnvs",accessEnvs);
+        ZkUtils.constructMenu(model, zkClient);
         model.addAttribute("curParentPath", ZooKeeperConst.PUBLICCONFIG);
         return "pubconf";
     }
@@ -35,12 +34,17 @@ public class PublicConfController {
     public @ResponseBody Page getPubPros(HttpServletRequest request,
                                          @RequestParam("pq_curpage") int pq_curpage,
                                          @RequestParam("pq_rpp") int pq_rpp,
-                                         @RequestParam("pq_datatype") String pq_datatype){
+                                         @RequestParam("filterMode") boolean filterMode
+                                         ){
         Page page = new Page();
         page.setPageCount(pq_rpp);
         page.setCurPage(pq_curpage);
-        System.out.println(request.getParameterMap());
-        page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG,page,zkClient);
+        if(!filterMode){
+            page = ZkUtils.getPage(ZooKeeperConst.PUBLICCONFIG,page,zkClient);
+        }else{
+            String filterValue = request.getParameter("filterValue");
+            page = ZkUtils.getFilter(ZooKeeperConst.PUBLICCONFIG,page,zkClient,filterValue);
+        }
         return page;
     }
 }

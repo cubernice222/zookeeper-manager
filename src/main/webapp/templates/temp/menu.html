@@ -5,7 +5,7 @@
             <ul class="greybox">
                 <li sec:authorize="hasRole('ROLE_admin')"><a th:href="@{/showSpkey.htm}">统一密钥</a></li>
                 <li><a th:href="@{/showpubconf.htm}">公共配置</a></li>
-                <li sec:authorize="hasRole('ROLE_admin')"><a href="#" onclick="accSpkey()">环境管理</a></li>
+                <li><a th:href="@{/displayEnv.htm}">环境管理</a></li>
             </ul>
         </div>
     </li>

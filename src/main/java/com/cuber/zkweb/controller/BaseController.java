@@ -26,7 +26,7 @@ public class BaseController {
     private ZkClient zkClient;
 
     @GetMapping("/index.htm")
-    public ModelAndView index(Map<String, Object> model){
+    public ModelAndView index(Map<String,Object> model){
         List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
         model.put("accessEnvs",accessEnvs);
         return new ModelAndView("index").addAllObjects(model);

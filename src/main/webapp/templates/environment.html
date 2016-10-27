@@ -20,25 +20,25 @@
         <div id="popup-dialog-crud" style="display:none;">
             <form id="crud-form">
                 <div class="input-group">
-                    <span class="input-group-addon">节点名称:</span>
+                    <span class="input-group-addon">环境名称:</span>
                     <input type="text" class="form-control" name="name" id="name">
-                    <input type="hidden" class="form-control" name="type" value="4">
+                    <input type="hidden" class="form-control" name="type" value="1">
                 </div>
                 <div class="input-group">
-                    <span class="input-group-addon">节点描述:</span>
+                    <span class="input-group-addon">环境描述:</span>
                     <input type="hidden" id="parentPath" class="form-control" name="parentPath" th:value="${curParentPath}">
                     <input type="text" class="form-control" name="desc" id="desc">
                 </div>
                 <div class="input-group">
-                    <span class="input-group-addon">节点值域:</span>
+                    <span class="input-group-addon">环境权限:</span>
                     <input type="hidden" name="editType" value="add" id="editType"/>
-                    <input type="text" class="form-control" name="value" id="value">
+                    <select class="form-control" name="accRule" id="accRule">
+                        <option th:each="role,itemStat:${roleList}" th:value="${role.accRole}" th:text="${role.desc}"/>
+                    </select>
                 </div>
                 <div class="input-group">
-                        <span class="input-group-addon">
-                            <input type="hidden" name="mask" id="mask" value="false"/>
-                            <input type="checkbox" name="maskCheck" id="maskCheck" onchange="changeMask()">是否加密
-                        </span>
+                    <span class="input-group-addon">访问密钥:</span>
+                    <input type="password" class="form-control" name="accKey" id="accKey">
                 </div>
             </form>
         </div>
@@ -46,38 +46,24 @@
             <div>
                 <ol class="breadcrumb">
                     <li><a th:href="@{/index.htm}">配置中心</a></li>
-                    <li><a th:href="@{/showpubconf.htm}">公共配置</a></li>
+                    <li><a th:href="@{/displayEnv.htm}">环境管理</a></li>
                 </ol>
             </div>
             <div id="grid_paging" style="margin:5px auto;"></div>
         </div>
         <script type="application/javascript">
-            function changeMask(){
-                $("#mask").val($("#maskCheck").prop("checked"));
-            }
             $(function () {
                 var colM = [
-                    { title: "节点名称", width: 130, dataIndx: "name", editable:false},
-                    { title: "节点描述", width: 100, dataIndx: "desc" , editable:false},
-                    { title: "是否加密", width: 100, dataIndx: "mask", editable:false,
-                        dataType: "bool",editor: { type: "checkbox", style: "margin:3px 5px;" }},//checkbox show
-                    { title: "节点值", width: 100, dataIndx: "value" , editable:false}
+                    { title: "环境名称", width: 130, dataIndx: "name", editable:false},
+                    { title: "环境描述", width: 100, dataIndx: "desc" , editable:false},
+                    { title: "环境权限", width: 100, dataIndx: "accRule", editable:false},//checkbox show
+                    { title: "访问密钥", width: 100, dataIndx: "accKey" , editable:false}
                 ];
                 var dataModel = {
                     location: "remote",
                     dataType: "JSON",
                     method: "POST",
-                    url: "/showAllPros.json",
-                    beforeSend: function( jqXHR, settings ){
-                        var searchValue =$(".filterValue").val();
-                        settings.data = settings.data + "&filterMode=";
-                        if("" != searchValue){
-                            settings.data = settings.data + "true&filterValue="+searchValue;
-                        }else{
-                            settings.data = settings.data + "false";
-                        }
-                        return true;
-                    },
+                    url: "/getEnv.json",
                     getData: function (dataJSON) {
                         return { curPage: dataJSON.curPage, totalRecords: dataJSON.totalRecords, data: dataJSON.data };
                     }
@@ -86,11 +72,11 @@
                     dataModel: dataModel,
                     colModel: colM,
                     freezeCols: 0,
-                    pageModel: { type: "remote", rPP: 10, strRpp: "{0}" },
+                    pageModel: { type: "remote", rPP: 20, strRpp: "{0}", rPPOptions:[20]},
                     sortable: false,
                     wrap: false, hwrap: false,
                     numberCell:{resizable:false, width:30, title:""},
-                    title: "公共节点管理",
+                    title: "环境管理",
                     resizable: false
                 }
                 pgConf.toolbar = {
@@ -99,13 +85,8 @@
                         { type: 'button', label: '增加', listeners: [{ click: addRow}], icon: 'ui-icon-plus' },
                         { type: 'button', label: '编辑', listeners: [{ click: editRow}], icon: 'ui-icon-pencil' },
                         { type: 'button', label: '删除', listeners: [{ click: deleteRow}], icon: 'ui-icon-minus' },
-                        { type: "<span style='margin:5px;'查询</span>" },
-                        { type: 'textbox', listeners: [{ 'change': filterhandler}] ,attr: 'placeholder="输入查找的关键字"', cls: "filterValue" },
                     ]
                 };
-                function filterhandler(evt, ui) {
-                    $grid.pqGrid('refreshDataAndView');
-                }
                 var modifyAddDialog = $( "#popup-dialog-crud" ).dialog({
                     resizable: false,
                     height: "auto",
@@ -125,9 +106,8 @@
                         $frm.find('input[name="name"]').val(row.name);
                         $frm.find('input[name="name"]').attr('readonly','readonly');
                         $frm.find('input[name="desc"]').val(row.desc);
-                        $frm.find('input[name="mask"]').val(row.mask);
-                        $frm.find('input[name="maskCheck"]').prop('checked',row.mask);
-                        $frm.find('input[name="value"]').val(row.value);
+                        $frm.find('select[name="accRule"]').val(row.accRule);
+                        $frm.find('input[name="accKey"]').val(row.accKey);
                         $("#editType").val("edit");
                         modifyAddDialog.dialog("open");
                     }
@@ -141,7 +121,7 @@
                             $(this).val('');
                         }
                     });
-                    $frm.find('input[name="mask"]').val(false);
+                    $frm.find('select[name="accRule"]').val('ROLE_Zkdev');//默认设置为DIV环境
                     $frm.find('input[name="name"]').attr('readonly',false);
                     $("#editType").val("add");
                     modifyAddDialog.dialog("open");
@@ -150,7 +130,7 @@
                     var $frm = $("form#crud-form");
                     $.ajax({
                         type: "POST",
-                        url: "[[@{/modifyZkpros.json}]]",
+                        url: "[[@{/editEnv.json}]]",
                         dataType:"json",
                         data:$frm.serialize(),
                         success: function(result) {

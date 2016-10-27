@@ -27,8 +27,7 @@ public class SpkeyController {
 
     @RequestMapping(value = "/showSpkey.htm",method = RequestMethod.GET)
     public String showSpkeyValue(Model model){
-        List<ZooKeeperEnviromentNode> accessEnvs = ZkUtils.getCurrentUserVisualEnvNode(zkClient);
-        model.addAttribute("accessEnvs",accessEnvs);
+        ZkUtils.constructMenu(model, zkClient);
         model.addAttribute("spkey",zkClient.readData(ZooKeeperConst.ZKSPKEY));
         return "spkey";
     }

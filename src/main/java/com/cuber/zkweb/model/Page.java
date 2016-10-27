@@ -13,8 +13,15 @@ public class Page {
     private int curPage = 1;//当前页码
     private int pages;
 
-    private List<ZooKeeperProsNode> data;
+    private List data;
 
+    public List getData() {
+        return data;
+    }
+
+    public void setData(List data) {
+        this.data = data;
+    }
 
     public int getPageCount() {
         return pageCount;
@@ -48,11 +55,4 @@ public class Page {
         this.pages = pages;
     }
 
-    public List<ZooKeeperProsNode> getData() {
-        return data;
-    }
-
-    public void setData(List<ZooKeeperProsNode> data) {
-        this.data = data;
-    }
 }

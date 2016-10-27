@@ -52,32 +52,13 @@ public class NodeController {
     public @ResponseBody ResponseMessage addPublicPros(HttpServletRequest request,
                                                        ZooKeeperNode zkpros,
                                                        @RequestParam("editType") String editType){
-        ZkUtils.haveRightAccessNode(zkClient,zkpros);
         Endecrypt endecrypt = new Endecrypt();
-        ResponseMessage responseMessage = new ResponseMessage();
         if(zkpros.isMask()){
             String maskKey = zkClient.readData(ZooKeeperConst.ZKSPKEY);
             zkpros.setMaskKey(maskKey);
             zkpros.setValue(endecrypt.get3DESEncrypt(zkpros.getValue(),maskKey));
         }
-        String message = null;
-        if(ZkUtils.haveRightAccessNode(zkClient,zkpros)){
-            if("add".equals(editType)){
-                responseMessage.setDone(ZkUtils.createNode(zkpros,zkClient));
-                message = "节点已存在";
-            }else{
-                responseMessage.setDone(ZkUtils.update(zkpros,zkClient));
-                message = "节点不存在";
-            }
-            if(responseMessage.isDone()){
-                responseMessage.setMessage("成功");
-            }else{
-                responseMessage.setMessage(message);
-            }
-        }else{
-            responseMessage.setMessage("没有权限做此操作");
-        }
-
+        ResponseMessage responseMessage = ZkUtils.editNode(zkpros,zkClient,editType);
         return responseMessage;
     }
 
