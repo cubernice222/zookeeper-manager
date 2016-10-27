@@ -84,14 +84,27 @@
                     resizable: false
                 }
                 pgConf.toolbar = {
+                    cls: "pq-toolbar-search",
                     items: [
                         { type: 'button', label: '增加', listeners: [{ click: addRow}], icon: 'ui-icon-plus' },
                         { type: 'button', label: '编辑', listeners: [{ click: editRow}], icon: 'ui-icon-pencil' },
                         { type: 'button', label: '删除', listeners: [{ click: deleteRow}], icon: 'ui-icon-minus' },
-                        { type: "<span style='margin:5px;'></span>" },
-                        { type: 'textbox', attr: 'placeholder="输入查找的关键字"', cls: "filterValue" },
+                        { type: "<span style='margin:5px;'查询</span>" },
+                        { type: 'textbox', listeners: [{ 'change': filterhandler}] ,attr: 'placeholder="输入查找的关键字"', cls: "filterValue" },
                     ]
                 };
+                function filterhandler(evt, ui) {
+                    var $toolbar = $grid.find('.pq-toolbar-search'),
+                            $value = $toolbar.find(".filterValue"),
+                            value = $value.val(),
+                            filterObject;
+                    filterObject = {"searchData":value};
+                    alert(filterObject.searchData);
+                    $grid.pqGrid("filter", {
+                        oper: 'replace',
+                        data: filterObject
+                    });
+                }
                 var modifyAddDialog = $( "#popup-dialog-crud" ).dialog({
                     resizable: false,
                     height: "auto",
