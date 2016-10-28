@@ -19,8 +19,8 @@ public class ZkPropsHolderConfigure extends ZkPropsConfigurerSupport {
     public ZkPropsHolderConfigure() {
     }
 
-    public ZkPropsHolderConfigure(Resource zkconfigMainPath, String zkprojectName, int order) throws Exception {
-        super(zkconfigMainPath, zkprojectName, order);
+    public ZkPropsHolderConfigure(int order) throws Exception {
+        super(order);
     }
 
     /** Never check system properties. */

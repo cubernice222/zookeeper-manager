@@ -17,3 +17,7 @@ spring:
   thymeleaf:
     prefix: /templates/
     cache: false
+
+zkprops:
+  loader:
+    location: file:/opt/pay/config.properties

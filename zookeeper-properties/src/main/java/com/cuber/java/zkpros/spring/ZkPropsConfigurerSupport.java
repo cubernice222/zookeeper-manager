@@ -5,7 +5,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.config.*;
-import org.springframework.core.io.Resource;
 import org.springframework.util.StringValueResolver;
 
 
@@ -18,8 +17,8 @@ public abstract class ZkPropsConfigurerSupport extends ZkPropsResourceConfigure
     public ZkPropsConfigurerSupport() {
         super();
     }
-    public ZkPropsConfigurerSupport(Resource zkconfigMainPath, String zkprojectName, int order) throws Exception {
-        super(zkconfigMainPath,zkprojectName,order);
+    public ZkPropsConfigurerSupport( int order) throws Exception {
+        super(order);
     }
 
 

@@ -22,8 +22,7 @@ public abstract class ZkPropsResourceConfigure extends ZkPropsResource
         super();
     }
 
-    public ZkPropsResourceConfigure(Resource zkconfigMainPath, String zkprojectName, int order) throws Exception {
-        super(zkconfigMainPath, zkprojectName);
+    public ZkPropsResourceConfigure( int order) throws Exception {
         this.order = order;
     }
 

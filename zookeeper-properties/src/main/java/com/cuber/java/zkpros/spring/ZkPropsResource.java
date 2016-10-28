@@ -10,10 +10,16 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.PropertiesPersister;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +37,9 @@ public class ZkPropsResource {
      * /opt/pay/config.properties
      */
     private Resource zkconfigMainPath;
+
+
+    private ResourceLoader resourceLoader;
 
     /**
      * 项目名称
@@ -63,51 +72,60 @@ public class ZkPropsResource {
     public ZkPropsResource() {
     }
 
-    public ZkPropsResource(Resource zkconfigMainPath, String zkprojectName) throws Exception{
-        this.zkconfigMainPath = zkconfigMainPath;
-        this.zkprojectName = zkprojectName;
-        EncodedResource resource = new EncodedResource(zkconfigMainPath, "UTF-8");
-        try {
-            InputStream stream = null;
-            Reader reader = null;
+    public void initConfigure(Environment environment) throws Exception{
+        if( environment != null){
+            if(resourceLoader == null)
+                resourceLoader = new DefaultResourceLoader();
+            String mainPath = environment.getProperty("zkprops.loader.location");
+            if(StringUtils.isEmpty(mainPath))
+                throw new BeanInitializationException("zookeeper loader location can't find in environment please check zkprops.loader.location");
+            this.zkprojectName = environment.getProperty("spring.application.name");
+            if(StringUtils.isEmpty(zkprojectName))
+                throw new BeanInitializationException("application name can't find in environment please check spring.application.name");
+            try{
+                this.zkconfigMainPath = resourceLoader.getResource(mainPath);
+            }catch (Exception e){
+                throw new BeanInitializationException("zkprops.loader.location not currect resource");
+
+            }
+            EncodedResource resource = new EncodedResource(zkconfigMainPath, "UTF-8");
             try {
-                if (resource.requiresReader()) {
-                    reader = resource.getReader();
-                    propertiesPersister.load(result, reader);
-                } else {
-                    stream = resource.getInputStream();
-                    propertiesPersister.load(result, stream);
+                InputStream stream = null;
+                Reader reader = null;
+                try {
+                    if (resource.requiresReader()) {
+                        reader = resource.getReader();
+                        propertiesPersister.load(result, reader);
+                    } else {
+                        stream = resource.getInputStream();
+                        propertiesPersister.load(result, stream);
+                    }
+                }
+                finally {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                    if (reader != null) {
+                        reader.close();
+                    }
+                }
+            } catch (IOException ex) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Could not load properties from " + zkconfigMainPath + ": " + ex.getMessage());
+                }
+                else {
+                    throw ex;
                 }
             }
-            finally {
-                if (stream != null) {
-                    stream.close();
-                }
-                if (reader != null) {
-                    reader.close();
-                }
+            String zkServerLists = result.getProperty("zookeeper.server.lists");
+            String envString = result.getProperty("zookeeper.manage.env");
+            String accCode = result.getProperty("zookeeper.manage.acckey");
+            ZkClient zkClient = new ZkClient(zkServerLists);
+            if(zkClient != null){
+                result = accEnv(envString,zkClient,result,zkprojectName,accCode);
             }
-        } catch (IOException ex) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("Could not load properties from " + zkconfigMainPath + ": " + ex.getMessage());
-            }
-            else {
-                throw ex;
-            }
-        }
-        String zkServerLists = result.getProperty("zookeeper.server.lists");
-        String envString = result.getProperty("zookeeper.manage.env");
-        String accCode = result.getProperty("zookeeper.manage.acckey");
-        ZkClient zkClient = new ZkClient(zkServerLists);
-        if(zkClient != null){
-            result = accEnv(envString,zkClient,result,zkprojectName,accCode);
         }
     }
-
-
-
-
-
     public Properties accEnv(String env, ZkClient zkClient, Properties properties, String projectName, String accCode){
         String envPath = ZooKeeperConst.ZKROOT + "/" + env;
         ZooKeeperEnviromentNode envObj = getZkObj(envPath,zkClient,ZooKeeperEnviromentNode.class);
@@ -183,4 +201,7 @@ public class ZkPropsResource {
         this.zkprojectName = zkprojectName;
     }
 
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 }

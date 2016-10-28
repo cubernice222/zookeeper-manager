@@ -14,7 +14,7 @@ import java.util.Properties;
 /**
  * Created by cuber on 2016/10/27.
  */
-public class FinalZkpropsConfigure extends ZkPropsConfigurerSupport implements EnvironmentAware {
+public class FinalZkpropsConfigure extends ZkPropsConfigurerSupport implements EnvironmentAware{
     public static final String LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME = "localProperties";
     public static final String ENVIRONMENT_PROPERTIES_PROPERTY_SOURCE_NAME = "environmentProperties";
     private MutablePropertySources propertySources;
@@ -24,16 +24,12 @@ public class FinalZkpropsConfigure extends ZkPropsConfigurerSupport implements E
     public FinalZkpropsConfigure() {
     }
 
-    public FinalZkpropsConfigure(Resource zkconfigMainPath, String zkprojectName, int order) throws Exception {
-        super(zkconfigMainPath,zkprojectName,order);
+    public FinalZkpropsConfigure( int order) throws Exception {
+        super(order);
     }
 
     public void setPropertySources(PropertySources propertySources) {
         this.propertySources = new MutablePropertySources(propertySources);
-    }
-
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
     }
 
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -80,4 +76,16 @@ public class FinalZkpropsConfigure extends ZkPropsConfigurerSupport implements E
         Assert.state(this.appliedPropertySources != null, "PropertySources have not get been applied");
         return this.appliedPropertySources;
     }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        try{
+            initConfigure(environment);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
 }

@@ -9,30 +9,8 @@
         <script src="/js/jquery-ui.min.js"></script>
     </head>
     <body>
-        <ul id="menu">
-            <li>
-                <a href="#" class="drop">配置中心</a>
-                <div class="dropdown_1column">
-                    <ul class="greybox">
-                        <li sec:authorize="hasRole('ROLE_admin')"><a th:href="@{/showSpkey.htm}">统一密钥</a></li>
-                        <li><a th:href="@{/showpubconf.htm}">公共配置</a></li>
-                        <li sec:authorize="hasRole('ROLE_admin')"><a href="#" onclick="accSpkey()">环境管理</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li th:each="oneEnvNode,itemStat:${accessEnvs}">
-                <a href="showSubProject(${oneEnvNode.parentPath},${oneEnvNode.name})" class="drop" th:text="${oneEnvNode.desc}"></a>
-            </li>
-            <li class="menu_right">
-                <a href="#" class="drop">当前用户</a>
-                <div class="dropdown_1column align_right">
-                    <div class="col_1">
-                        <p class="black_box" sec:authentication="name"}></p>
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <div style="padding: 100px 100px 10px;" class="mydiv">
+    <div th:include="temp/menu">&nbsp;</div>
+    <div style="padding: 100px 100px 10px;" class="mydiv">
             <div>
                 <ol class="breadcrumb">
                     <li><a th:href="@{/index.htm}">配置中心</a></li>
